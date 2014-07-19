@@ -90,13 +90,16 @@ class Event(models.Model):
     time = models.TimeField(null=True)
     description = models.CharField(max_length=2000)
 
-    def getEvent(self):
+    def getEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
-        retParticipants = [(id, name, image) for ((id,name), image) in zip(participants, photos)]
+        retParticipants = [(id, name, str(image)[str(image).find('/')+1:]) for ((id,name), image) in zip(participants, photos)]
+        fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
+        print fbFriendsIds
+        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
         comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
         return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
-                "localizationAddress" : self.localization.adress, "sport" : self.sport.name,
+                "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friends" : commonFriends,
                 "date" : str(self.date), "time" : str(self.time), "description" : self.description, "comments" : comments}
 
 class Comment(models.Model):

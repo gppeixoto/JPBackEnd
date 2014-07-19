@@ -5,5 +5,5 @@ admin.autodiscover()
 
 urlpatterns = patterns('mainapp.views',
     url(r'^login/$', 'login', name = 'login'),
-    url(r'^image/$', 'image', name = 'image'),
+    url(r'^events/$', 'events', name = 'events'),
 )

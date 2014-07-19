@@ -115,3 +115,13 @@ AUTH_PROFILE_MODULE = 'mainapp.Profile'
 FACEBOOK_STORE_FRIENDS = True
 
 FACEBOOK_DEFAULT_SCOPE = ['email', 'public_profile', 'user_friends']
+
+from django.conf import settings
+
+import os
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+STATICFILES_DIRS = (
+  os.path.join(SITE_ROOT, 'static/'),
+)
+
+FACEBOOK_PROFILE_IMAGE_PATH = 'DatabaseJP/static/'

@@ -43,8 +43,11 @@ class Profile(FacebookModel):
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in dbFriends]
+        for i in photos:
+            print i
         retFriends = [(id, name, image) for ((id,name), image) in zip(dbFriends, photos)]
-        return [personalInformation, retFriends, ratingsInformation]
+        retEvents = [event.getEvent() for event in Event.objects.filter(persons=self)]
+        return {"information" : personalInformation, "rating" : ratingsInformation, "events" : retEvents, "friends" : retFriends}
 
 
 @receiver(post_save) 
@@ -79,15 +82,24 @@ class Localization(models.Model):
     adress = models.CharField(max_length=200)
 
 class Event(models.Model):
+    name = models.CharField(max_length=50)
     persons = models.ManyToManyField(Profile)
     localization = models.ForeignKey(Localization)
     sport = models.ForeignKey(Sport)
     date = models.DateField(default=datetime.date.today)
     time = models.TimeField(null=True)
+    description = models.CharField(max_length=2000)
 
     def getEvent(self):
         participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
         retParticipants = [(id, name, image) for ((id,name), image) in zip(participants, photos)]
-        return [retParticipants, [self.localization.name, self.localization.adress], self.sport.name, str(self.date), str(self.time)]
+        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
+        return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
+                "localizationAddress" : self.localization.adress, "sport" : self.sport.name,
+                "date" : str(self.date), "time" : str(self.time), "description" : self.description, "comments" : comments}
 
+class Comment(models.Model):
+    event = models.ForeignKey(Event)
+    person = models.ForeignKey(Profile)
+    text = models.CharField(max_length=2000)

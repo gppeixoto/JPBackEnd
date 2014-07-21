@@ -11,8 +11,12 @@ import os, datetime
 def get_image_path(instance, filename):
     return os.path.join('sports', filename)
 
+def getUserImageUrl(image):
+    return str(image)[str(image).find('/')+1:]
+
 class Profile(FacebookModel):
     user = models.OneToOneField(User)
+    notifications = models.BooleanField(default=True)
 
     def rate(self, sport, value):
         rating, _ = Rating.objects.get_or_create(person=self, sport=sport)
@@ -37,16 +41,14 @@ class Profile(FacebookModel):
 
 
     def getUserProfile(self, fb_user):
-        personalInformation = [self.facebook_name, self.getTotalRating()]
+        personalInformation = [self.facebook_name, self.getTotalRating(), getUserImageUrl(self.image)]
         sportRatings = Rating.objects.filter(person=self)
         ratingsInformation = [(sportRating.sport.name, sportRating.rating) for sportRating in sportRatings]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        photos = [Profile.objects.get(facebook_id=id).image for (id, _) in dbFriends]
-        for i in photos:
-            print i
+        photos = [getUserImageUrl(Profile.objects.get(facebook_id=id).image) for (id, _) in dbFriends]
         retFriends = [(id, name, image) for ((id,name), image) in zip(dbFriends, photos)]
-        retEvents = [event.getEvent() for event in Event.objects.filter(persons=self)]
+        retEvents = [event.getEvent(fb_user) for event in Event.objects.filter(persons=self)]
         return {"information" : personalInformation, "rating" : ratingsInformation, "events" : retEvents, "friends" : retFriends}
 
 
@@ -83,6 +85,7 @@ class Localization(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=50)
+    price = models.DecimalField(default=0.0, decimal_places=2, max_digits=5)
     persons = models.ManyToManyField(Profile)
     localization = models.ForeignKey(Localization)
     sport = models.ForeignKey(Sport)
@@ -93,14 +96,14 @@ class Event(models.Model):
     def getEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
-        retParticipants = [(id, name, str(image)[str(image).find('/')+1:]) for ((id,name), image) in zip(participants, photos)]
+        retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
-        print fbFriendsIds
         commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
         comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
         return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friends" : commonFriends,
-                "date" : str(self.date), "time" : str(self.time), "description" : self.description, "comments" : comments}
+                "date" : str(self.date), "time" : str(self.time), "description" : self.description, "comments" : comments,
+                "id": self.id}
 
 class Comment(models.Model):
     event = models.ForeignKey(Event)

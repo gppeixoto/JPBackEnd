@@ -8,6 +8,8 @@ from django.forms.models import model_to_dict
 from django_facebook.api import *
 from open_facebook.api import *
 from mainapp.models import *
+import time
+from decimal import Decimal
 
 # Create your views here.
 
@@ -15,6 +17,31 @@ def connect(request, access_token):
     action, user = connect_user(request, access_token)
     profile = Profile.objects.get(user=user)
     return profile, FacebookUserConverter(OpenFacebook(access_token))
+
+def login(request):
+    # data = json.loads(request.read())
+    # access_token = data['access_token']
+    # print access_token 
+    access_token = 'CAAJ6iZBGS5FIBAAh57TLZAa8SpwUsdtdu9cLE8qlXwgZChoXoXSrsqUCBYX8dVRChVtxyU9R3KHeOshmoj3NKfuAkQVZCyqYcKZAB9FCAdrcZAgInhYMuZA0yqiHkdBzsFL4FKjARZBNW4OAR3T5V8wfCsXio9yQ2gpgwP0lH2XIVy02oZCQ452gIJvGPfk6zZBSCg31qs6DsDA93rYv8sw0CE'
+    profile, fb_user = connect(request, access_token)
+    # redireciona pra alguma coisa 
+    return HttpResponse(json.dumps(profile.getUserProfile(fb_user)['information']), content_type="application/json")
+
+def userAgenda(request):
+    data = json.loads(request.read())
+    access_token = data['access_token'] 
+    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
+    profile, fb_user = connect(request, access_token)
+    eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
+    return HttpResponse(json.dumps(eventList), content_type="application/json")
+
+def userProfile(request):
+    data = json.loads(request.read())
+    access_token = data['access_token'] 
+    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
+    profile, fb_user = connect(request, access_token)
+    userInfo = profile.getUserProfile(fb_user)
+    return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
 def getMatchedEvents(request):
     data = json.loads(request.read())
@@ -39,30 +66,6 @@ def getMatchedEvents(request):
     retEvents = [event.getEvent(fb_user) for event in events]
     return HttpResponse(json.dumps(retEvents), content_type="application/json")
 
-def login(request):
-    data = json.loads(request.read())
-    access_token = data['access_token'] 
-    # access_token = 'CAAJ6iZBGS5FIBAD1X9Hs6puxHso1itZAMERkA0Ez02biPTHbD1bClTDHaiKnYwFZAcdRbr0ITgAQoJNtGSmY0r89aFj6Y0MfmzCqZAkRAS1AAU1nRezZAPK14NlF4jbCdYC9qNPIvOkWIPhTJzyHAZBhzXkedpnG2eWcoNu2MaAfFYmulov3FrZBDYJGwlgkKrSGWMGvDw4XlTlNFW86rI9SbxbtvbEjT4ZD'
-    profile, fb_user = connect(request, access_token)
-    # redireciona pra alguma coisa 
-    return HttpResponse(json.dumps(profile.getUserProfile(fb_user)['information']), content_type="application/json")
-
-def agenda(request):
-    data = json.loads(request.read())
-    access_token = data['access_token'] 
-    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
-    profile, fb_user = connect(request, access_token)
-    eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
-    return HttpResponse(json.dumps(eventList), content_type="application/json")
-
-def userProfile(request):
-    data = json.loads(request.read())
-    access_token = data['access_token'] 
-    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
-    profile, fb_user = connect(request, access_token)
-    userInfo = profile.getUserProfile(fb_user)
-    return HttpResponse(json.dumps(userInfo), content_type="application/json")
-
 def enterEvent(request):
     data = json.loads(request.read())
     access_token = data['access_token']
@@ -72,3 +75,26 @@ def enterEvent(request):
     event.persons.add(profile)
     event.save()
     return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
+
+# def createEvent(request):
+#     data = json.loads(request.read())
+#     access_token = data['access_token']
+#     profile, fb_user = connect(request, access_token)
+#     localizationName = data['localizationName']
+#     localizationAddress = data['localizationAddress']
+#     eventLocalization = Localization.objects.get_or_create(name=localizationName, adress=localizationAddress)
+#     sportName = data['eventSport']
+#     eventSport = Sport.objects.get(name=sportName)
+#     eventDay = time.strptime(data['eventDay'], "%d %m %Y")
+#     eventTime = time.strptime(date['eventTime'], "%H %M")
+#     eventDescription = data['eventDescription']
+#     eventName = data['eventName']
+#     eventPrice = Decimal(data['eventPrice'])
+#     newEvent = Event(name=eventName, description=eventDescription, localization=eventLocalization, 
+#                     sport=eventSport, date=eventDay, time=eventTime, price=eventPrice)
+#     newEvent.persons.add(profile)
+#     newEvent.save()
+#     return HttpResponse(json.dumps(newEvent.getEvent(fb_user)), content_type="application/json")
+
+
+

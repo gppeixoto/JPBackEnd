@@ -10,6 +10,9 @@ from open_facebook.api import *
 from mainapp.models import *
 import time
 from decimal import Decimal
+from django.shortcuts import render, redirect
+import urllib2
+import urllib
 
 # Create your views here.
 
@@ -19,18 +22,17 @@ def connect(request, access_token):
     return profile, FacebookUserConverter(OpenFacebook(access_token))
 
 def login(request):
-    # data = json.loads(request.read())
-    # access_token = data['access_token']
-    # print access_token 
-    access_token = 'CAAJ6iZBGS5FIBAAh57TLZAa8SpwUsdtdu9cLE8qlXwgZChoXoXSrsqUCBYX8dVRChVtxyU9R3KHeOshmoj3NKfuAkQVZCyqYcKZAB9FCAdrcZAgInhYMuZA0yqiHkdBzsFL4FKjARZBNW4OAR3T5V8wfCsXio9yQ2gpgwP0lH2XIVy02oZCQ452gIJvGPfk6zZBSCg31qs6DsDA93rYv8sw0CE'
+    data = json.loads(request.read())
+    print request.read()
+    print data
+    access_token = data['access_token']
+    print access_token 
     profile, fb_user = connect(request, access_token)
-    # redireciona pra alguma coisa 
     return HttpResponse(json.dumps(profile.getUserProfile(fb_user)['information']), content_type="application/json")
 
 def userAgenda(request):
     data = json.loads(request.read())
     access_token = data['access_token'] 
-    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
     profile, fb_user = connect(request, access_token)
     eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
     return HttpResponse(json.dumps(eventList), content_type="application/json")
@@ -38,14 +40,12 @@ def userAgenda(request):
 def userProfile(request):
     data = json.loads(request.read())
     access_token = data['access_token'] 
-    # access_token = 'CAAJ6iZBGS5FIBAKQXc6fPRoomdEFFvDr2SxF5NXCdm6tihH37INqywoelZCEXZCE44nCrNQpJI6eZB0BJSoiESkyGyqMbfmDNuFioNTFavmRX3KkjsIBhuXacJR73G9dr98cJWhw1mlG5417mRXZButu8pHd705FVBh52aZC3ZBmLNkIaHUlIMZAZATXjnWnJuhwZD'
     profile, fb_user = connect(request, access_token)
     userInfo = profile.getUserProfile(fb_user)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
 def getMatchedEvents(request):
     data = json.loads(request.read())
-    # data = {'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD', 'address' : "", 'date' : "", 'time' : "", 'sports' : ["Futebol"]}
     events = Event.objects.all()
     qAddress = data['address']
     if qAddress != "":
@@ -54,9 +54,12 @@ def getMatchedEvents(request):
     qDate = data['date']
     if qDate != "":
         events = events.filter(date=qDate)
-    qTime = data['time']
-    if qTime != "":
-        events = events.filter(time__lte=qTime)
+    qTimeBegin = data['start_time']
+    if qTimeBegin != "":
+        events = events.filter(timeBegin__gte=qTimeBegin)
+    qTimeEnd = data['end_time']
+    if qTimeEnd != "":
+        events = events.filter(timeEnd__lte=qTimeEnd)
     qSport = data['sports']
     if qSport != []:
         sports = [Sport.objects.get(name=sport) for sport in qSport]
@@ -64,7 +67,7 @@ def getMatchedEvents(request):
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     retEvents = [event.getEvent(fb_user) for event in events]
-    return HttpResponse(json.dumps(retEvents), content_type="application/json")
+    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
 def enterEvent(request):
     data = json.loads(request.read())
@@ -97,4 +100,30 @@ def enterEvent(request):
 #     return HttpResponse(json.dumps(newEvent.getEvent(fb_user)), content_type="application/json")
 
 
+def testegetmatchedevents(request):
+    data = {
+        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD', 'address' : "", 'date' : "2014-07-19", 'start_time' : "", 'end_time' : "", 'sports' : []
+    }
 
+    try:
+        req = urllib2.Request('http://192.168.0.110:8000/getmatchedevents/')
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json.dumps(data))
+        return HttpResponse(response.read())
+    except HTTPError as e:
+        return HttpResponse(e.read())
+
+def testelogin(request):
+    data = {
+        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD'
+    }
+
+    try:
+        req = urllib2.Request('http://192.168.0.110:8000/login/')
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json.dumps(data))
+        return HttpResponse(response.read())
+    except HTTPError as e:
+        return HttpResponse(e.read())

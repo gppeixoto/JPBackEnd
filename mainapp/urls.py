@@ -9,4 +9,6 @@ urlpatterns = patterns('mainapp.views',
     url(r'^userprofile/$', 'userProfile', name = 'userProfile'),
     url(r'^enterevent/$', 'enterEvent', name = 'enterEvent'),
     url(r'^getmatchedevents/$', 'getMatchedEvents', name = 'getMatchedEvents'),
+    url(r'^testegetmatchedevents/$', 'testegetmatchedevents', name='teste'),
+    url(r'^testelogin/$', 'testelogin', name='testelogin')
 )

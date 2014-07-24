@@ -5,6 +5,7 @@ from django.dispatch.dispatcher import receiver
 from django.db.models.signals import post_save
 from django_facebook.utils import get_user_model, get_profile_model
 import os, datetime
+from decimal import Decimal
 
 # Create your models here.
 
@@ -90,8 +91,10 @@ class Event(models.Model):
     localization = models.ForeignKey(Localization)
     sport = models.ForeignKey(Sport)
     date = models.DateField(default=datetime.date.today)
-    time = models.TimeField(null=True)
+    timeBegin = models.TimeField(null=True)
+    timeEnd = models.TimeField(null=True)
     description = models.CharField(max_length=2000)
+    private = models.BooleanField()
 
     def getEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
@@ -99,11 +102,29 @@ class Event(models.Model):
         retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
         commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
-        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
+        formattedDate = self.date.strftime("%d/%m")
+        formattedTimeBegin = self.timeBegin.strftime("%H:%M")
+        price = (Decimal('100') * self.price).quantize(Decimal('1.'))
         return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
-                "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friends" : commonFriends,
-                "date" : str(self.date), "time" : str(self.time), "description" : self.description, "comments" : comments,
-                "id": self.id}
+                "localizationAddress" : self.localization.adress, "sport" : self.sport.name,
+                "friendsCount" : commonFriends, "date" : formattedDate, "timeBegin" : formattedTimeBegin,
+                "id": self.id, "price" : str(price), "private" : self.private}
+
+    def getDetailedEvent(self, fb_user):
+        photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
+        retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
+        fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
+        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
+        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
+        formattedDate = self.date.strftime("%d/%m")
+        formattedTimeBegin = self.timeBegin.strftime("%H:%M")
+        formattedTimeEnd = self.timeEnd.strftime("%H:%M")
+        price = (Decimal('100') * self.price).quantize(Decimal('1.'))
+        return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
+                "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : commonFriends,
+                "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
+                "description" : self.description, "comments" : comments, "id": self.id, "price" : price, 
+                "private" : self.private}
 
 class Comment(models.Model):
     event = models.ForeignKey(Event)

@@ -42,15 +42,13 @@ class Profile(FacebookModel):
 
 
     def getUserProfile(self, fb_user):
-        personalInformation = [self.facebook_name, self.getTotalRating(), getUserImageUrl(self.image)]
         sportRatings = Rating.objects.filter(person=self)
         ratingsInformation = [(sportRating.sport.name, sportRating.rating) for sportRating in sportRatings]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        photos = [getUserImageUrl(Profile.objects.get(facebook_id=id).image) for (id, _) in dbFriends]
-        retFriends = [(id, name, image) for ((id,name), image) in zip(dbFriends, photos)]
-        retEvents = [event.getEvent(fb_user) for event in Event.objects.filter(persons=self)]
-        return {"information" : personalInformation, "rating" : ratingsInformation, "events" : retEvents, "friends" : retFriends}
+        return {"name" : self.facebook.name, "url" : getUserImageUrl(self.image), 
+                "rating" : ratingsInformation, "friends" : len(dbFriends),
+                "notifications" : self.notifications}
 
 
 @receiver(post_save) 
@@ -83,6 +81,8 @@ class Rating(models.Model):
 class Localization(models.Model):
     name = models.CharField(max_length=50)
     adress = models.CharField(max_length=200)
+    neighbourhood = models.CharField(max_length=200)
+    city = models.CharField(max_length=200)
 
 class Event(models.Model):
     name = models.CharField(max_length=50)
@@ -108,7 +108,8 @@ class Event(models.Model):
         return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name,
                 "friendsCount" : commonFriends, "date" : formattedDate, "timeBegin" : formattedTimeBegin,
-                "id": self.id, "price" : str(price), "private" : self.private}
+                "id": self.id, "price" : str(price), "private" : self.private, "city" : self.localization.city,
+                "neighbourhood" : self.localization.neighbourhood}
 
     def getDetailedEvent(self, fb_user):
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]

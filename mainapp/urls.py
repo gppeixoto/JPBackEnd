@@ -8,7 +8,9 @@ urlpatterns = patterns('mainapp.views',
     url(r'^useragenda/$', 'userAgenda', name = 'userAgenda'),
     url(r'^userprofile/$', 'userProfile', name = 'userProfile'),
     url(r'^enterevent/$', 'enterEvent', name = 'enterEvent'),
+    url(r'^create/$', 'createEvent', name = 'createEvent'),
     url(r'^getmatchedevents/$', 'getMatchedEvents', name = 'getMatchedEvents'),
-    url(r'^testegetmatchedevents/$', 'testegetmatchedevents', name='teste'),
-    url(r'^testelogin/$', 'testelogin', name='testelogin')
+    url(r'^testgetmatchedevents/$', 'testgetmatchedevents', name='testgetmatchedevents'),
+    url(r'^testlogin/$', 'testlogin', name='testlogin'),
+    url(r'^testcreate/$', 'testcreate', name='testcreate'),
 )

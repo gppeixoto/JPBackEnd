@@ -23,10 +23,8 @@ def connect(request, access_token):
 
 def login(request):
     data = json.loads(request.read())
-    print request.read()
     print data
     access_token = data['access_token']
-    print access_token 
     profile, fb_user = connect(request, access_token)
     return HttpResponse(json.dumps(profile.getUserProfile(fb_user)['information']), content_type="application/json")
 
@@ -79,30 +77,42 @@ def enterEvent(request):
     event.save()
     return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
 
-# def createEvent(request):
-#     data = json.loads(request.read())
-#     access_token = data['access_token']
-#     profile, fb_user = connect(request, access_token)
-#     localizationName = data['localizationName']
-#     localizationAddress = data['localizationAddress']
-#     eventLocalization = Localization.objects.get_or_create(name=localizationName, adress=localizationAddress)
-#     sportName = data['eventSport']
-#     eventSport = Sport.objects.get(name=sportName)
-#     eventDay = time.strptime(data['eventDay'], "%d %m %Y")
-#     eventTime = time.strptime(date['eventTime'], "%H %M")
-#     eventDescription = data['eventDescription']
-#     eventName = data['eventName']
-#     eventPrice = Decimal(data['eventPrice'])
-#     newEvent = Event(name=eventName, description=eventDescription, localization=eventLocalization, 
-#                     sport=eventSport, date=eventDay, time=eventTime, price=eventPrice)
-#     newEvent.persons.add(profile)
-#     newEvent.save()
-#     return HttpResponse(json.dumps(newEvent.getEvent(fb_user)), content_type="application/json")
+def createEvent(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    profile, fb_user = connect(request, access_token)
+    localizationName = data['localizationName']
+    localizationAddress = data['localizationAddress']
+    city = data['city']
+    neighbourhood = data['neighbourhood']
+    eventLocalization, _ = Localization.objects.get_or_create(name=localizationName, adress=localizationAddress,neighbourhood=neighbourhood,city=city)
+    sportName = data['eventSport']
+    eventSport = Sport.objects.get(name=sportName)
+    eventDay = data['eventDay']
+    eventTimeBegin = data['eventTimeBegin']
+    eventTimeEnd = data['eventTimeEnd']
+    eventDescription = data['eventDescription']
+    eventName = data['eventName']
+    eventPrice = Decimal(data['eventPrice'])
+    private = data['private']
+    newEvent = Event(name=eventName, description=eventDescription, localization=eventLocalization, 
+                    sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
+                    price=eventPrice,private=private)
+    newEvent.save()
+    id = newEvent.id;
+    newEvent.persons.add(profile)
+    bdEvent = Event.objects.get(id=id)
+    return HttpResponse(json.dumps(bdEvent.getEvent(fb_user)), content_type="application/json")
 
 
-def testegetmatchedevents(request):
+def testgetmatchedevents(request):
     data = {
-        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD', 'address' : "", 'date' : "2014-07-19", 'start_time' : "", 'end_time' : "", 'sports' : []
+        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD',
+        'address' : "",
+        'date' : "",
+        'start_time' : "",
+        'end_time' : "",
+        'sports' : []
     }
 
     try:
@@ -114,13 +124,39 @@ def testegetmatchedevents(request):
     except HTTPError as e:
         return HttpResponse(e.read())
 
-def testelogin(request):
+def testlogin(request):
     data = {
         'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD'
     }
 
     try:
         req = urllib2.Request('http://192.168.0.110:8000/login/')
+        req.add_header('Content-Type', 'application/json')
+
+        response = urllib2.urlopen(req, json.dumps(data))
+        return HttpResponse(response.read())
+    except HTTPError as e:
+        return HttpResponse(e.read())
+
+def testcreate(request):
+    data = {
+        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD',
+        'localizationName' : 'CIn - UFPE',
+        'localizationAddress' : 'Av. Jornalista Anibal Fernandes',
+        'city' : 'Recife',
+        'neighbourhood' : 'Cidade Universitaria',
+        'eventSport' : 'Ping Pong',
+        'eventDay' : '2014-08-18',
+        'eventTimeBegin' : '08:00',
+        'eventTimeEnd' : '12:00',
+        'eventDescription' : 'Demo day',
+        'eventName' : 'Ping pong do Demo Day',
+        'eventPrice' : '0.00',
+        'private' : False,
+    }
+
+    try:
+        req = urllib2.Request('http://192.168.0.110:8000/create/')
         req.add_header('Content-Type', 'application/json')
 
         response = urllib2.urlopen(req, json.dumps(data))

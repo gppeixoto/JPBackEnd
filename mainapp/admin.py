@@ -6,3 +6,4 @@ from models import *
 admin.site.register(Profile)
 admin.site.register(Event)
 admin.site.register(Sport)
+admin.site.register(Tag)

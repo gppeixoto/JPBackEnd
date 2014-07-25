@@ -44,10 +44,14 @@ class Profile(FacebookModel):
     def getUserProfile(self, fb_user):
         sportRatings = Rating.objects.filter(person=self)
         ratingsInformation = [(sportRating.sport.name, sportRating.rating) for sportRating in sportRatings]
+        sportsInformation = [(sport.name, Event.objects.filter(persons=self, sport=sport).count()) for sport in Sport.objects.all()]
+        tags = Tag.objects.filter(person=self)
+        tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        return {"name" : self.facebook.name, "url" : getUserImageUrl(self.image), 
-                "rating" : ratingsInformation, "friends" : len(dbFriends),
+        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.image), 
+                "ratings" : ratingsInformation, "tags" : tagsInformation,
+                "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}
 
 
@@ -77,6 +81,14 @@ class Rating(models.Model):
             self.rating = (self.rating * self.numberOfVoters + value) / (self.numberOfVoters + 1)
         self.numberOfVoters += 1
 
+class Tag(models.Model):
+    person = models.ForeignKey(Profile)
+    name = models.CharField(max_length=30)
+    numberOfVoters = models.IntegerField(default=0)
+    icon = models.ImageField(upload_to=get_image_path, blank=True, null=True)
+
+    def tag(self):
+        self.numberOfVoters += 1 
 
 class Localization(models.Model):
     name = models.CharField(max_length=50)

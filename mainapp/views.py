@@ -16,7 +16,7 @@ import urllib
 
 # Create your views here.
 
-url_base = "http://192.168.0.110:8000/"
+url_base = "join-play.herokuapp.com/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)

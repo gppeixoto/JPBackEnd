@@ -1,0 +1,1 @@
+web: gunicorn DatabaseJP.wsgi --log-file -

@@ -293,4 +293,6 @@ def testRateUser(request):
 
 def testHeroku(request):
     access_token = Profile.objects.get(facebook_name='Mateus Moury').access_token
+    profile = Profile.objects.get(access_token=access_token)
+    fb_user = FacebookUserConverter(OpenFacebook(access_token))
     return HttpResponse(json.dumps(profile.getUserProfile(fb_user)), content_type="application/json")

@@ -23,4 +23,5 @@ urlpatterns = patterns('mainapp.views',
     url(r'^testuserprofileid/$', 'testUserProfileId', name = 'testUserProfileId'),
     url(r'^testvoteintaguser/$', 'testVoteInTagUser', name = 'testVoteInTagUser'),
     url(r'^testrateuser/$', 'testRateUser', name = 'testRateUser'),
+    url(r'^testheroku/$', 'testHeroku', name = 'testHeroku'),
 )

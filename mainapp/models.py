@@ -124,6 +124,7 @@ class Event(models.Model):
                 "neighbourhood" : self.localization.neighbourhood}
 
     def getDetailedEvent(self, fb_user):
+        participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
         photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
         retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]

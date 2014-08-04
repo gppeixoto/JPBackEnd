@@ -17,6 +17,7 @@ import urllib
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
+#url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -86,8 +87,8 @@ def getEvent(request):
     evt_id = data['id']
     event = Event.objects.get(id=evt_id)
     profile, fb_user = connect(request, access_token)
-    retEvents = [event.getDetailedEvent(fb_user)]
-    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
+    retEvent = event.getDetailedEvent(fb_user)
+    return HttpResponse(json.dumps({"event" : retEvent}), content_type="application/json")
 
 def enterEvent(request):
     data = json.loads(request.read())

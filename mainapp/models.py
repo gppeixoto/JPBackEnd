@@ -137,7 +137,7 @@ class Event(models.Model):
         return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : commonFriends,
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
-                "description" : self.description, "comments" : comments, "id": self.id, "price" : price, 
+                "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price), 
                 "private" : self.private}
 
 class Comment(models.Model):

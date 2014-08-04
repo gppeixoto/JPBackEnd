@@ -25,4 +25,5 @@ urlpatterns = patterns('mainapp.views',
     url(r'^testvoteintaguser/$', 'testVoteInTagUser', name = 'testVoteInTagUser'),
     url(r'^testrateuser/$', 'testRateUser', name = 'testRateUser'),
     url(r'^testheroku/$', 'testHeroku', name = 'testHeroku'),
+    url(r'^testgetevent/$', 'testGetEvent', name = 'testGetEvent'),
 )

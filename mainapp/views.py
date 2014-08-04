@@ -84,11 +84,10 @@ def getEvent(request):
     data = json.loads(request.read())
     access_token = data['access_token']
     evt_id = data['id']
-    events = Event.objects.get(id=evt_id)
+    event = Event.objects.get(id=evt_id)
     profile, fb_user = connect(request, access_token)
-    retEvents = [event.getDetailedEvent(fb_user) for event in events]
+    retEvents = [event.getDetailedEvent(fb_user)]
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
-
 
 def enterEvent(request):
     data = json.loads(request.read())
@@ -306,3 +305,10 @@ def testHeroku(request):
     profile = Profile.objects.get(access_token=access_token)
     fb_user = FacebookUserConverter(OpenFacebook(access_token))
     return HttpResponse(json.dumps(profile.getUserProfile(fb_user)), content_type="application/json")
+
+def testGetEvent(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'id' : 1
+    }
+    return viewTester(data, 'getevent/')

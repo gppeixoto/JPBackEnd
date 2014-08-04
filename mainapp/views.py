@@ -80,6 +80,16 @@ def getMatchedEvents(request):
     retEvents = [event.getEvent(fb_user) for event in events]
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
+def getEvent(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    evt_id = data['id']
+    events = Event.objects.get(id=evt_id)
+    profile, fb_user = connect(request, access_token)
+    retEvents = [event.getDetailedEvent(fb_user) for event in events]
+    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
+
+
 def enterEvent(request):
     data = json.loads(request.read())
     access_token = data['access_token']

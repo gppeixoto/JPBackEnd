@@ -121,7 +121,7 @@ STATICFILES_DIRS = (
 )
 
 FACEBOOK_PROFILE_IMAGE_PATH = 'DatabaseJP/static/'
-'''
+
 # Parse database configuration from $DATABASE_URL
 import dj_database_url
 DATABASES['default'] =  dj_database_url.config()
@@ -140,4 +140,4 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
     os.path.join(PROJECT_PATH, 'static'),
-)'''
+)

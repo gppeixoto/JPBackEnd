@@ -16,8 +16,8 @@ import urllib
 
 # Create your views here.
 
-# url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+url_base = "http://join-play.herokuapp.com/"
+#url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -185,7 +185,18 @@ def rateUser(request):
     userInfo = profile.getUserProfile(fb_user)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
-
+def comment(request):
+    data = json.loads(request.read())
+    evtId = data['event_id']
+    userId = data['user_id']
+    comentario = data['comment']
+    profile = Profile.objects.get(facebook_id=userId)
+    evento = Event.objects.get(id=evtId)
+    new_comment = Comment(event=evento,person=profile,text=comentario)
+    new_comment.save()
+    foto = getUserImageUrl(profile.image)
+    nome = profile.facebook_name
+    return HttpResponse(json.dumps({"photo":foto,"name":nome}), content_type="application/json")
 
 
 
@@ -313,3 +324,4 @@ def testGetEvent(request):
         'id' : 1
     }
     return viewTester(data, 'getevent/')
+    

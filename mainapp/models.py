@@ -12,8 +12,8 @@ from decimal import Decimal
 def get_image_path(instance, filename):
     return os.path.join('sports', filename)
 
-def getUserImageUrl(image):
-    return str(image)[str(image).find('/')+1:]
+def getUserImageUrl(fb_id):
+    return "https://graph.facebook.com/" + str(fb_id) + "/picture"
 
 class Profile(FacebookModel):
     user = models.OneToOneField(User)
@@ -49,7 +49,7 @@ class Profile(FacebookModel):
         tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.image), 
+        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id), 
                 "ratings" : ratingsInformation, "tags" : tagsInformation,
                 "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}
@@ -109,32 +109,28 @@ class Event(models.Model):
     private = models.BooleanField()
 
     def getEvent(self, fb_user):
-        participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
-        photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
-        retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
+        participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
-        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
+        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, participants))
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
-        return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
+        return {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name,
                 "friendsCount" : commonFriends, "date" : formattedDate, "timeBegin" : formattedTimeBegin,
                 "id": self.id, "price" : str(price), "private" : self.private, "city" : self.localization.city,
                 "neighbourhood" : self.localization.neighbourhood}
 
     def getDetailedEvent(self, fb_user):
-        participants = [(friend.facebook_id, friend.facebook_name) for friend in self.persons.all()]
-        photos = [Profile.objects.get(facebook_id=id).image for (id, _) in participants]
-        retParticipants = [(id, name, getUserImageUrl(image)) for ((id,name), image) in zip(participants, photos)]
+        participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
-        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, retParticipants))
+        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, participants))
         comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
-        return {"name" : self.name, "participants" : retParticipants, "localizationName" : self.localization.name,
+        return {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : commonFriends,
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price), 

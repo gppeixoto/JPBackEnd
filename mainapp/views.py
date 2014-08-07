@@ -124,6 +124,8 @@ def createEvent(request):
     newEvent.save()
     id = newEvent.id;
     newEvent.persons.add(profile)
+    if private:
+        newEvent.visible.add(profile)
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
     return HttpResponse(json.dumps(bdEvent.getEvent(fb_user)), content_type="application/json")
@@ -224,9 +226,7 @@ def invite(request):
         profile = Profile.objects.get(facebook_id=user_id)
         event.visible.add(profile)
     event.save()
-    return HttpResponse(json.dumps({'user_id_list' : userId}), content_type="application/json")
-
-
+    return HttpResponse(json.dumps({'user_id_list' : listUsers}), content_type="application/json")
 
 
 # sends a http post to the url that we want to test, 
@@ -358,4 +358,12 @@ def testComment(request):
         'comment' : 'Oba!' 
     }
     return viewTester(data, 'comment/')
+
+def testInvite(request):
+    data = {
+        'event_id' : 4,
+        'id' : 724231594302199,
+        'user_id_list' : [687719994632948]
+    }
+    return viewTester(data, 'invite/')
     

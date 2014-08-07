@@ -17,7 +17,7 @@ import urllib
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-#url_base = "http://localhost:8000/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -33,14 +33,14 @@ def login(request):
 
 def userAgenda(request):
     data = json.loads(request.read())
-    access_token = data['access_token'] 
+    access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
     return HttpResponse(json.dumps(eventList), content_type="application/json")
 
 def userProfile(request):
     data = json.loads(request.read())
-    access_token = data['access_token'] 
+    access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     userInfo = profile.getUserProfile(fb_user)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
@@ -102,6 +102,16 @@ def enterEvent(request):
     event.save()
     return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
 
+def leaveEvent(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    profile, fb_user = connect(request, access_token)
+    eventId = data['id']
+    event = Event.objects.get(id=eventId)
+    event.persons.remove(profile)
+    event.save()
+    return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
+
 def createEvent(request):
     data = json.loads(request.read())
     access_token = data['access_token']
@@ -120,7 +130,7 @@ def createEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
-    newEvent = Event(name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization, 
+    newEvent = Event(name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
@@ -154,7 +164,7 @@ def editEvent(request):
     event = Event.objects.get(id=id)
     if event.creatorProfile.facebook_id != profile.facebook_id:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
-    newEvent = Event(id=id,name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization, 
+    newEvent = Event(id=id,name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
@@ -231,7 +241,7 @@ def invite(request):
     return HttpResponse(json.dumps({'user_id_list' : listUsers}), content_type="application/json")
 
 
-# sends a http post to the url that we want to test, 
+# sends a http post to the url that we want to test,
 # simulating future uses
 def viewTester(data, url):
     try:
@@ -309,6 +319,14 @@ def testEnterEvent(request):
 
     return viewTester(data, 'enterevent/')
 
+def testLeaveEvent(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Jefferson Medeiros').access_token,
+        'id' : 1,
+    }
+
+    return viewTester(data, 'leaveevent/')
+
 def testUserProfile(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
@@ -357,7 +375,7 @@ def testComment(request):
     data = {
         'event_id' : 1,
         'user_id' : 628143283960150,
-        'comment' : 'Oba!' 
+        'comment' : 'Oba!'
     }
     return viewTester(data, 'comment/')
 
@@ -368,4 +386,3 @@ def testInvite(request):
         'user_id_list' : [687719994632948]
     }
     return viewTester(data, 'invite/')
-    

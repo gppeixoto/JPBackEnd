@@ -76,10 +76,10 @@ def getMatchedEvents(request):
     if qSport != []:
         sports = [Sport.objects.get(name=sport) for sport in qSport]
         events = events.filter(sport__in=sports)
-    publicEvents = events.filter(private=False)
-    visibleEvents = events.filter(private=True, visible=profile)
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
+    publicEvents = events.filter(private=False)
+    visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in events]
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
@@ -245,7 +245,7 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'address' : "",
         'date' : "",
         'start_time' : "",

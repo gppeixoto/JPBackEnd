@@ -80,7 +80,7 @@ def getMatchedEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in events]
+    retEvents = [event.getEvent(fb_user) for event in publicEvents + visibleEvents]
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
 def getEvent(request):
@@ -245,7 +245,7 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
         'address' : "",
         'date' : "",
         'start_time' : "",

@@ -49,7 +49,7 @@ class Profile(FacebookModel):
         tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id),
+        return {"id": self.facebook_id, "name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id),
                 "ratings" : ratingsInformation, "tags" : tagsInformation,
                 "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}

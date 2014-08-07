@@ -201,8 +201,6 @@ def comment(request):
 
 
 
-
-
 # sends a http post to the url that we want to test, 
 # simulating future uses
 def viewTester(data, url):
@@ -324,4 +322,12 @@ def testGetEvent(request):
         'id' : 1
     }
     return viewTester(data, 'getevent/')
+
+def testComment(request):
+    data = {
+        'event_id' : 1,
+        'user_id' : 628143283960150,
+        'comment' : 'Ola, estou comentando.' 
+    }
+    return viewTester(data, 'comment/')
     

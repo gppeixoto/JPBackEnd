@@ -321,7 +321,7 @@ def testEnterEvent(request):
 
 def testLeaveEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Jefferson Medeiros').access_token,
+        'access_token' : 'CAAJ6iZBGS5FIBAGAjtXAxbpONpW1xJBo1PcoeKQkwVWPLJC8okuf4D4eYt8aS1l21f6erZBZAQg9BNqPZAiuls4bsZBAZCxwwTHCaQsIsV0899xsD4qievDsgvHmlGhysC9WcFifuI9EwLpgUHtnT71p4WItZAl35uhNwIFYjnYxFOMyfgb7OJvSpNmJSSydFcZD',
         'id' : 1,
     }
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django_facebook.models import FacebookModel 
+from django_facebook.models import FacebookModel
 from django.dispatch.dispatcher import receiver
 from django.db.models.signals import post_save
 from django_facebook.utils import get_user_model, get_profile_model
@@ -49,24 +49,24 @@ class Profile(FacebookModel):
         tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id), 
+        return {"name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id),
                 "ratings" : ratingsInformation, "tags" : tagsInformation,
                 "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}
 
 
-@receiver(post_save) 
+@receiver(post_save)
 def create_profile(sender, instance, created, **kwargs):
     if sender == get_user_model():
         user = instance
-        profile_model = get_profile_model() 
+        profile_model = get_profile_model()
         if profile_model == Profile and created:
             profile, new = Profile.objects.get_or_create(user=instance)
 
 class Sport(models.Model):
     name = models.CharField(max_length=30)
     ratings = models.ManyToManyField(Profile, through='Rating')
-    icon = models.ImageField(upload_to=get_image_path, blank=True, null=True) 
+    icon = models.ImageField(upload_to=get_image_path, blank=True, null=True)
 
 class Rating(models.Model):
     person = models.ForeignKey(Profile)
@@ -88,7 +88,7 @@ class Tag(models.Model):
     icon = models.ImageField(upload_to=get_image_path, blank=True, null=True)
 
     def tag(self):
-        self.numberOfVoters += 1 
+        self.numberOfVoters += 1
 
 class Localization(models.Model):
     name = models.CharField(max_length=50)
@@ -128,7 +128,7 @@ class Event(models.Model):
         participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
         commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, participants))
-        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id) for comment in Comment.objects.filter(event=self)]
+        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id)) for comment in Comment.objects.filter(event=self)]
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
@@ -136,7 +136,7 @@ class Event(models.Model):
         return {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : commonFriends,
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
-                "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price), 
+                "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
                 "private" : self.private}
 
 class Comment(models.Model):

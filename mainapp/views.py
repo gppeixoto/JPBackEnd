@@ -118,7 +118,7 @@ def createEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
-    newEvent = Event(name=eventName, creator=profile, description=eventDescription, localization=eventLocalization, 
+    newEvent = Event(name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization, 
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
@@ -150,9 +150,9 @@ def editEvent(request):
     private = data['private']
     id = data['id']
     event = Event.objects.get(id=id)
-    if event.creator.facebook_id != profile.facebook_id:
+    if event.creatorProfile.facebook_id != profile.facebook_id:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
-    newEvent = Event(id=id,name=eventName, creator=profile, description=eventDescription, localization=eventLocalization, 
+    newEvent = Event(id=id,name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization, 
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
@@ -165,7 +165,7 @@ def deleteEvent(request):
     userId = data['user_id']
     evtId = data['event_id']
     event = Event.objects.get(id=evtId)
-    if event.creator.facebook_id != userId:
+    if event.creatorProfile.facebook_id != userId:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
     event.delete()
     return HttpResponse(json.dumps({"Nothing":"Nothing"}), content_type="application/json")
@@ -220,7 +220,7 @@ def invite(request):
     evtId = data['event_id']
     userId = data['id']
     event = Event.objects.get(id=evtId)
-    if event.creator.facebook_id != userId:
+    if event.creatorProfileProfile.facebook_id != userId:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
     for user_id in listUsers:
         profile = Profile.objects.get(facebook_id=user_id)

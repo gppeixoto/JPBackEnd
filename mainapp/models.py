@@ -98,6 +98,7 @@ class Localization(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=50)
+    creatorProfile = models.ForeignKey(Profile, related_name="creatorProfile", null=True)
     price = models.DecimalField(default=0.0, decimal_places=2, max_digits=5)
     persons = models.ManyToManyField(Profile)
     localization = models.ForeignKey(Localization)
@@ -107,6 +108,8 @@ class Event(models.Model):
     timeEnd = models.TimeField(null=True)
     description = models.CharField(max_length=2000)
     private = models.BooleanField()
+    visible = models.ManyToManyField(Profile, related_name="visible", null=True)
+
 
     def getEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]

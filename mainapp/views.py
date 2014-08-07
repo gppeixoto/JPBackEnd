@@ -118,7 +118,7 @@ def createEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
-    newEvent = Event(name=eventName, description=eventDescription, localization=eventLocalization, 
+    newEvent = Event(name=eventName, creator=profile, description=eventDescription, localization=eventLocalization, 
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
@@ -147,13 +147,27 @@ def editEvent(request):
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
     id = data['id']
-    newEvent = Event(id=id,name=eventName, description=eventDescription, localization=eventLocalization, 
+    event = Event.objects.get(id=id)
+    if event.creator.facebook_id != profile.facebook_id:
+        return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
+    newEvent = Event(id=id,name=eventName, creator=profile, description=eventDescription, localization=eventLocalization, 
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
                     price=eventPrice,private=private)
     newEvent.save()
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
     return HttpResponse(json.dumps(bdEvent.getEvent(fb_user)), content_type="application/json")
+
+def deleteEvent(request):
+    data = json.loads(request.read())
+    userId = data['user_id']
+    evtId = data['event_id']
+    event = Event.objects.get(id=evtId)
+    if event.creator.facebook_id != userId:
+        return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
+    event.delete()
+    return HttpResponse(json.dumps({"Nothing":"Nothing"}), content_type="application/json")
+
 
 def voteInTagUser(request):
     data = json.loads(request.read())
@@ -197,6 +211,20 @@ def comment(request):
     foto = getUserImageUrl(profile.image)
     nome = profile.facebook_name
     return HttpResponse(json.dumps({"photo":foto,"name":nome}), content_type="application/json")
+
+def invite(request):
+    data = json.loads(request.read())
+    listUsers = data['user_id_list']
+    evtId = data['event_id']
+    userId = data['id']
+    event = Event.objects.get(id=evtId)
+    if event.creator.facebook_id != userId:
+        return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
+    for user_id in listUsers:
+        profile = Profile.objects.get(facebook_id=user_id)
+        event.visible.add(profile)
+    event.save()
+    return HttpResponse(json.dumps({'user_id_list' : userId}), content_type="application/json")
 
 
 
@@ -327,7 +355,7 @@ def testComment(request):
     data = {
         'event_id' : 1,
         'user_id' : 628143283960150,
-        'comment' : 'Ola, estou comentando.' 
+        'comment' : 'Oba!' 
     }
     return viewTester(data, 'comment/')
     

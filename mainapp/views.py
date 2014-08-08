@@ -257,7 +257,7 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'address' : "",
         'date' : "",
         'start_time' : "",

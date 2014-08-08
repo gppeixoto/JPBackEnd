@@ -242,6 +242,20 @@ def invite(request):
     event.save()
     return HttpResponse(json.dumps({'user_id_list' : listUsers}), content_type="application/json")
 
+def getFriends(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    profile, fb_user = connect(request, access_token)
+    listFriendsId = [friend['id'] for friend in fb_user.get_friends()]
+    listFriends = []
+    for friendId in listFriendsId:
+        try:
+           nextFriend = Profile.objects.get(facebook_id=friendId)
+        except Profile.DoesNotExist:
+           nextFriend = None
+        if nextFriend is not None:
+            listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId)))
+    return HttpResponse(json.dumps({'friends':listFriends}), content_type="application/json")
 
 # sends a http post to the url that we want to test,
 # simulating future uses
@@ -257,7 +271,7 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'address' : "",
         'date' : "",
         'start_time' : "",
@@ -354,8 +368,8 @@ def testVoteInTagUser(request):
 def testRateUser(request):
     data = {
         'sport' : 'Futebol',
-        'value' : 3.5,
-        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id
+        'value' : 2.0,
+        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
     }
 
     return viewTester(data, 'rateuser/')
@@ -388,3 +402,9 @@ def testInvite(request):
         'user_id_list' : [687719994632948]
     }
     return viewTester(data, 'invite/')
+
+def testgetFriends(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token
+    }
+    return viewTester(data, 'getfriends/')

@@ -134,14 +134,21 @@ class Event(models.Model):
     def getDetailedEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
-        commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, participants))
+        listFriends = []
+        listNotFriends = []
+        for participant in participants:
+            if str(participant[0]) in fbFriendsIds:
+                listFriends.append(participant)
+            else:
+                listNotFriends.append(participant)
+        participants = listFriends + listNotFriends
         comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id), str(comment.time), str(comment.day)) for comment in Comment.objects.filter(event=self)]
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
         return {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
-                "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : commonFriends,
+                "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
                 "private" : self.private}

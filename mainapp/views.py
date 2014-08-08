@@ -224,7 +224,9 @@ def comment(request):
     new_comment.save()
     foto = getUserImageUrl(profile.image)
     nome = profile.facebook_name
-    return HttpResponse(json.dumps({"photo":foto,"name":nome}), content_type="application/json")
+    time = new_comment.time
+    day = new_comment.day
+    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":time,"day":day}), content_type="application/json")
 
 def invite(request):
     data = json.loads(request.read())
@@ -366,7 +368,7 @@ def testHeroku(request):
 
 def testGetEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'id' : 1
     }
     return viewTester(data, 'getevent/')

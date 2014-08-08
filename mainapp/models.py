@@ -128,7 +128,7 @@ class Event(models.Model):
         participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
         commonFriends = len(filter(lambda (id, name, image): str(id) in fbFriendsIds, participants))
-        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id)) for comment in Comment.objects.filter(event=self)]
+        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id), str(comment.time), str(comment.day)) for comment in Comment.objects.filter(event=self)]
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
@@ -143,3 +143,5 @@ class Comment(models.Model):
     event = models.ForeignKey(Event)
     person = models.ForeignKey(Profile)
     text = models.CharField(max_length=2000)
+    time = models.TimeField(default=datetime.datetime.now().time())
+    day = models.DateField(default=datetime.datetime.today().date())

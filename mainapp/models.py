@@ -96,6 +96,14 @@ class Localization(models.Model):
     neighbourhood = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
 
+class Search(models.Model):
+    person = models.ForeignKey(Profile)
+    localization = models.ForeignKey(Localization)
+    date = models.DateField(default=datetime.date.today)
+    timeBegin = models.TimeField(null=True)
+    timeEnd = models.TimeField(null=True)
+    sport = models.ManyToManyField(Sport)
+
 class Event(models.Model):
     name = models.CharField(max_length=50)
     creatorProfile = models.ForeignKey(Profile, related_name="creatorProfile", null=True)

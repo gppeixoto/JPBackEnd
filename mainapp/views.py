@@ -410,5 +410,5 @@ def testgetFriends(request):
     return viewTester(data, 'getfriends/')
 
 def testaailuqueto(request):
-  r = requests.get('http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt')
-  return HttpResponse(r.json(), content_type="application/json")
+  data = urllib2.urlopen("http://example.com/foo/bar").read()
+  return HttpResponse(json.dumps(data), content_type="application/json")

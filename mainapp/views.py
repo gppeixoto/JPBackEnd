@@ -81,17 +81,20 @@ def getMatchedEvents(request):
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
 
     qAddress = data['address']
-    toSortArray = []
-    i = 0
-    for event in retEvents:
-        toSortArray.append((getDistance(qAddress, event['localizationAddress']), i))
-        i += 1
-    toSortArray.sort()
-    retSortedEvents = []
-    for nextId in toSortArray:
-        actDict = retEvents[nextId[1]]
-        actDict['localizationDistance'] = retEvents[nextId[0]]
-        retSortedEvents.append(actDict)
+    if qAddress != "":
+        toSortArray = []
+        i = 0
+        for event in retEvents:
+            toSortArray.append((getDistance(qAddress, event['localizationAddress']), i))
+            i += 1
+        toSortArray.sort()
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = retEvents[nextId[1]]
+            actDict['localizationDistance'] = nextId[0]
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = retEvents
 
     '''
     try:
@@ -321,7 +324,7 @@ def viewTester(data, url):
 def testGetMatchedEvents(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
-        'address' : "",
+        'address' : "R. Estrela - Casa Amarela, Recife - Pernambuco",
         'date' : "2014-01-08",
         'start_time' : "09:00",
         'end_time' : "16:00",

@@ -60,9 +60,6 @@ def userProfileId(request):
 def getMatchedEvents(request):
     data = json.loads(request.read())
     events = Event.objects.all()
-    if qAddress != "":
-        localization = Localization.objects.get(address=qAddress)
-        events = Event.filter(localization=localization)
     qDate = data['date']
     if qDate != "":
         events = events.filter(date__gte=qDate)
@@ -82,6 +79,19 @@ def getMatchedEvents(request):
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
 
+    qAddress = data['address']
+    toSortArray = []
+    i = 0
+    for event in retEvents:
+        toSortArray.append((getDistance(qAddress, event['localizationAddress']), i))
+        i += 1
+    toSortArray.sort()
+    retSortedEvents = []
+    for nextId in toSortArray:
+        actDict = retEvents[nextId[1]]
+        actDict['localizationDistance'] = retEvents[nextId[0]]
+        retSortedEvents.append(actDict)
+
     '''
     try:
         prevSearch = Search.objects.get(person=profile)
@@ -97,7 +107,7 @@ def getMatchedEvents(request):
     newSearch.save()
     '''
 
-    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
+    return HttpResponse(json.dumps({"events" : retSortedEvents}), content_type="application/json")
 
 def getEvent(request):
     data = json.loads(request.read())

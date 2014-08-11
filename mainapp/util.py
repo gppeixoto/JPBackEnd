@@ -57,4 +57,4 @@ def getDistance(origin, destiny):
     page = requests.get(queryText).text
     result = json.loads(page)
     result = result['rows'][0]['elements'][0]['distance']
-    return ({'text':result['text'], 'value':result['value']})
+    return result['value']

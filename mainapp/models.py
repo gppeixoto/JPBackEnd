@@ -96,6 +96,9 @@ class Localization(models.Model):
     neighbourhood = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
 
+    def __unicode__(self):
+        return self.name
+
 class Search(models.Model):
     person = models.ForeignKey(Profile)
     localization = models.ForeignKey(Localization, null=True)

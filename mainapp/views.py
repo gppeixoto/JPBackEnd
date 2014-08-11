@@ -113,7 +113,7 @@ def getMatchedEvents(request):
     newSearch.save()
     '''
 
-    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
+    return HttpResponse(json.dumps({"events" : retSortedEvents}), content_type="application/json")
 
 def getEvent(request):
     data = json.loads(request.read())

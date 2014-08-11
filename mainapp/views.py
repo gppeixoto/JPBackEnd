@@ -16,8 +16,8 @@ import urllib
 
 # Create your views here.
 
-# url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+url_base = "http://join-play.herokuapp.com/"
+#url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -96,7 +96,7 @@ def getMatchedEvents(request):
         newSearch.sport.add(Sport.objects.get(name=sport))
     newSearch.save()
     '''
-    
+
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
 def getEvent(request):
@@ -424,3 +424,7 @@ def testgetFriends(request):
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token
     }
     return viewTester(data, 'getfriends/')
+
+def testaailuqueto(request):
+  data = urllib2.urlopen("http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt").read()
+  return HttpResponse(json.dumps(data), content_type="application/json")

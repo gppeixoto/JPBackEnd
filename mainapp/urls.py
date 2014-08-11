@@ -35,4 +35,5 @@ urlpatterns = patterns('mainapp.views',
     url(r'^testcomment/$', 'testComment', name = 'testComment'),
     url(r'^testinvite/$', 'testInvite', name = 'testInvite'),
     url(r'^testgetfriends/$', 'testgetFriends', name = 'testgetFriends'),
+    url(r'testaluqueto/$', 'testaailuqueto', name = 'testaailuqueto'),
 )

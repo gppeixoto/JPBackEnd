@@ -18,7 +18,7 @@ import urllib
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-#url_base = "http://localhost:8000/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -294,6 +294,21 @@ def getAddresses(request):
         formattedAddresses.append(address['formatted_address'])
     return HttpResponse(json.dumps({'formatted_addresses':formattedAddresses}))
 
+def getDistance(request):
+    data = json.loads(request.read())
+    origin = data['origin']
+    destiny = data['destiny']
+    queryText = "http://maps.googleapis.com/maps/api/distancematrix/json?origins="
+    queryText += origin
+    queryText += "&destinations="
+    queryText += destiny
+    queryText += "&language=pt"
+    print queryText
+    page = requests.get(queryText).text
+    result = json.loads(page)
+    result = result['rows'][0]['elements'][0]['distance']['text']
+    return HttpResponse(json.dumps({'distance':result}))
+
 # sends a http post to the url that we want to test,
 # simulating future uses
 def viewTester(data, url):
@@ -453,6 +468,13 @@ def testGetAddresses(request):
         'city' : ''
     }
     return viewTester(data, 'getaddresses/')
+
+def testGetDistance(request):
+    data = {
+        'origin' : 'Rua+Jeronimo+Vilela+118+PE',
+        'destiny' : 'Centro+de+Informatica+PE'
+    }
+    return viewTester(data, 'getdistance/')
 
 def testaailuqueto(request):
   data = urllib2.urlopen("http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt").read()

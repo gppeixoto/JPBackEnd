@@ -367,8 +367,8 @@ def testVoteInTagUser(request):
 
 def testRateUser(request):
     data = {
-        'sport' : 'Futebol',
-        'value' : 2.0,
+        'sport' : 'Ping Pong',
+        'value' : 3.0,
         'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
     }
 

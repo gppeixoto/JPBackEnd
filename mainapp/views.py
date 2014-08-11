@@ -1,4 +1,5 @@
 from django.shortcuts import render
+import requests
 from models import Sport, Rating
 from django.contrib.auth.models import User
 from django_facebook.connect import connect_user
@@ -257,13 +258,32 @@ def getFriends(request):
             listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId)))
     return HttpResponse(json.dumps({'friends':listFriends}), content_type="application/json")
 
+def getAddresses(request):
+    data = json.loads(request.read())
+    textLocalName = data['local_name']
+    textStreet = data['street']
+    textNeighbourhood = data['neighbourhood']
+    textCity = data['city']
+    queryText = "https://maps.googleapis.com/maps/api/place/textsearch/json?query="
+    queryText += textLocalName+" "
+    queryText += textStreet+" "
+    queryText += textNeighbourhood+" "
+    queryText += textCity
+    queryText += "&sensor=true&key=AIzaSyDL-BaFaZBo_evgT2pXRJ1avAb8sWZ3KGE"
+    page = requests.get(queryText).text
+    result = json.loads(page)
+    # print result
+    formattedAddresses = []
+    for address in result['results']:
+        formattedAddresses.append(address['formatted_address'])
+    return HttpResponse(json.dumps({'formatted_addresses':formattedAddresses}))
+
 # sends a http post to the url that we want to test,
 # simulating future uses
 def viewTester(data, url):
     try:
         req = urllib2.Request(url_base + url)
         req.add_header('Content-Type', 'application/json')
-
         response = urllib2.urlopen(req, json.dumps(data))
         return HttpResponse(response.read(), content_type="application/json")
     except HTTPError as e:
@@ -408,6 +428,15 @@ def testgetFriends(request):
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token
     }
     return viewTester(data, 'getfriends/')
+
+def testGetAddresses(request):
+    data = {
+        'local_name' : 'Centro de Informatica UFPE',
+        'street' : '',
+        'neighbourhood' : '',
+        'city' : ''
+    }
+    return viewTester(data, 'getaddresses/')
 
 def testaailuqueto(request):
   data = urllib2.urlopen("http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt").read()

@@ -14,6 +14,7 @@ from decimal import Decimal
 from django.shortcuts import render, redirect
 import urllib2
 import urllib
+from util import *
 
 # Create your views here.
 

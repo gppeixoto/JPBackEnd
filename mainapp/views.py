@@ -79,7 +79,7 @@ def getMatchedEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
-
+    '''
     qAddress = data['address']
     if qAddress != "":
         toSortArray = []
@@ -97,6 +97,8 @@ def getMatchedEvents(request):
         retSortedEvents = retEvents
 
     '''
+
+    '''
     try:
         prevSearch = Search.objects.get(person=profile)
         prevSearch.delete()
@@ -111,7 +113,7 @@ def getMatchedEvents(request):
     newSearch.save()
     '''
 
-    return HttpResponse(json.dumps({"events" : retSortedEvents}), content_type="application/json")
+    return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
 def getEvent(request):
     data = json.loads(request.read())

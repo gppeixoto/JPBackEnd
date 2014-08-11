@@ -79,7 +79,7 @@ def getMatchedEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
-    '''
+    
     qAddress = data['address']
     if qAddress != "":
         toSortArray = []
@@ -96,7 +96,7 @@ def getMatchedEvents(request):
     else:
         retSortedEvents = retEvents
 
-    '''
+    
 
     '''
     try:
@@ -327,10 +327,10 @@ def testGetMatchedEvents(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
         'address' : "R. Estrela - Casa Amarela, Recife - Pernambuco",
-        'date' : "2014-01-08",
-        'start_time' : "09:00",
-        'end_time' : "16:00",
-        'sports' : ['Ping Pong']
+        'date' : "",
+        'start_time' : "",
+        'end_time' : "",
+        'sports' : []
     }
 
     return viewTester(data, 'getmatchedevents/')

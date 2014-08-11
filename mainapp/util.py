@@ -13,6 +13,7 @@ from decimal import Decimal
 from django.shortcuts import render, redirect
 import urllib2
 import urllib
+import requests
 
 def isSimilar(search1, search2):
     if search1.person == search2.person:
@@ -46,3 +47,14 @@ def getSimilarSearches(mySearch):
         if isIntersect:
             ret.append(intersection)
     return ret
+
+def getDistance(origin, destiny):
+    queryText = "http://maps.googleapis.com/maps/api/distancematrix/json?origins="
+    queryText += origin
+    queryText += "&destinations="
+    queryText += destiny
+    queryText += "&language=pt"
+    page = requests.get(queryText).text
+    result = json.loads(page)
+    result = result['rows'][0]['elements'][0]['distance']
+    return ({'text':result['text'], 'value':result['value']})

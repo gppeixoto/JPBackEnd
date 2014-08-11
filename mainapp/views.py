@@ -60,7 +60,6 @@ def userProfileId(request):
 def getMatchedEvents(request):
     data = json.loads(request.read())
     events = Event.objects.all()
-    qAddress = data['address']
     if qAddress != "":
         localization = Localization.objects.get(address=qAddress)
         events = Event.filter(localization=localization)
@@ -274,6 +273,8 @@ def getFriends(request):
             listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId)))
     return HttpResponse(json.dumps({'friends':listFriends}), content_type="application/json")
 
+#going to front-end
+'''
 def getAddresses(request):
     data = json.loads(request.read())
     textLocalName = data['local_name']
@@ -293,21 +294,7 @@ def getAddresses(request):
     for address in result['results']:
         formattedAddresses.append(address['formatted_address'])
     return HttpResponse(json.dumps({'formatted_addresses':formattedAddresses}))
-
-def getDistance(request):
-    data = json.loads(request.read())
-    origin = data['origin']
-    destiny = data['destiny']
-    queryText = "http://maps.googleapis.com/maps/api/distancematrix/json?origins="
-    queryText += origin
-    queryText += "&destinations="
-    queryText += destiny
-    queryText += "&language=pt"
-    print queryText
-    page = requests.get(queryText).text
-    result = json.loads(page)
-    result = result['rows'][0]['elements'][0]['distance']['text']
-    return HttpResponse(json.dumps({'distance':result}))
+'''
 
 # sends a http post to the url that we want to test,
 # simulating future uses
@@ -460,6 +447,8 @@ def testgetFriends(request):
     }
     return viewTester(data, 'getfriends/')
 
+#going to front-end
+'''
 def testGetAddresses(request):
     data = {
         'local_name' : 'Centro de Informatica UFPE',
@@ -468,13 +457,7 @@ def testGetAddresses(request):
         'city' : ''
     }
     return viewTester(data, 'getaddresses/')
-
-def testGetDistance(request):
-    data = {
-        'origin' : 'Rua+Jeronimo+Vilela+118+PE',
-        'destiny' : 'Centro+de+Informatica+PE'
-    }
-    return viewTester(data, 'getdistance/')
+'''
 
 def testaailuqueto(request):
   data = urllib2.urlopen("http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt").read()

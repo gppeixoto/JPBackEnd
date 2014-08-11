@@ -98,7 +98,7 @@ class Localization(models.Model):
 
 class Search(models.Model):
     person = models.ForeignKey(Profile)
-    localization = models.ForeignKey(Localization)
+    localization = models.ForeignKey(Localization, null=True)
     date = models.DateField(default=datetime.date.today)
     timeBegin = models.TimeField(null=True)
     timeEnd = models.TimeField(null=True)

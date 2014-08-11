@@ -26,7 +26,7 @@ def isSimilar(search1, search2):
     for sport in search1.sport.all():
         if sport in otherSports:
             commonSports.append(sport)
-    if commonSports != []:
+    if commonSports == []:
         return False, None
 
     intersection = {

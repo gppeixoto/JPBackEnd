@@ -16,8 +16,8 @@ import urllib
 
 # Create your views here.
 
-url_base = "http://join-play.herokuapp.com/"
-# url_base = "http://localhost:8000/"
+# url_base = "http://join-play.herokuapp.com/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -65,7 +65,7 @@ def getMatchedEvents(request):
         events = Event.filter(localization=localization)
     qDate = data['date']
     if qDate != "":
-        events = events.filter(date=qDate)
+        events = events.filter(date__gte=qDate)
     qTimeBegin = data['start_time']
     if qTimeBegin != "":
         events = events.filter(timeBegin__gte=qTimeBegin)
@@ -81,6 +81,22 @@ def getMatchedEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
+
+    '''
+    try:
+        prevSearch = Search.objects.get(person=profile)
+        prevSearch.delete()
+    except Search.DoesNotExist:
+        pass
+
+    # update when localization is fixed
+    newSearch = Search(person=profile, date=qDate, timeBegin=qTimeBegin, timeEnd=qTimeEnd)
+    newSearch.save()
+    for sport in qSport:
+        newSearch.sport.add(Sport.objects.get(name=sport))
+    newSearch.save()
+    '''
+    
     return HttpResponse(json.dumps({"events" : retEvents}), content_type="application/json")
 
 def getEvent(request):
@@ -271,12 +287,12 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
         'address' : "",
-        'date' : "",
-        'start_time' : "",
-        'end_time' : "",
-        'sports' : []
+        'date' : "2014-01-08",
+        'start_time' : "09:00",
+        'end_time' : "16:00",
+        'sports' : ['Ping Pong']
     }
 
     return viewTester(data, 'getmatchedevents/')

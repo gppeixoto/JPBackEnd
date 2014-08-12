@@ -296,7 +296,7 @@ def getInvites(request):
         inviteList = {}
         for invite in invites:
             formattedDate = invite.date.strftime("%d/%m")
-            if formattedDate < datetime.datetime.today().date():
+            if invite.date < datetime.datetime.today().date():
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}

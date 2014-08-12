@@ -1,3 +1,5 @@
+#encoding:utf-8
+
 from django.shortcuts import render
 import requests
 from models import Sport, Rating
@@ -57,6 +59,14 @@ def userProfileId(request):
     fb_user = FacebookUserConverter(OpenFacebook(access_token))
     userInfo = profile.getUserProfile(fb_user)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
+
+def getFutureEvents(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    events = Event.objects.filter(date__gte=str(datetime.datetime.today().date()))
+    profile, fb_user = connect(request, access_token)
+    retEvents = [event.getEvent(fb_user) for event in events]
+    return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
     data = json.loads(request.read())
@@ -372,18 +382,18 @@ def testLogin(request):
 def testCreateEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'localizationName' : 'CIn - UFPE',
-        'localizationAddress' : 'Av. Jornalista Anibal Fernandes',
+        'localizationName' : 'Casa do Rato',
+        'localizationAddress' : 'Av. Boa Viagem, 3650',
         'city' : 'Recife',
-        'neighbourhood' : 'Cidade Universitaria',
-        'eventSport' : 'Ping Pong',
+        'neighbourhood' : 'Boa Viagem',
+        'eventSport' : 'Futebol',
         'eventDay' : '2014-08-18',
-        'eventTimeBegin' : '08:00',
-        'eventTimeEnd' : '12:00',
-        'eventDescription' : 'Demo day',
-        'eventName' : 'Ping pong do Demo Day',
+        'eventTimeBegin' : '14:00',
+        'eventTimeEnd' : '16:00',
+        'eventDescription' : 'Pelada de Rafinha',
+        'eventName' : u'Futébol na Casa do Rato',
         'eventPrice' : '0.00',
-        'private' : False,
+        'private' : True,
     }
 
     return viewTester(data, 'createevent/')
@@ -495,6 +505,12 @@ def testGetInvites(request):
         'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
     }
     return viewTester(data, 'getinvites/')
+
+def testGetFutureEvents(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token
+    }
+    return viewTester(data, 'getfutureevents/')
 
 #going to front-end
 '''

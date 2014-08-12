@@ -301,8 +301,9 @@ def getInvites(request):
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
             if invite.sport.name in inviteList == False:
-                inviteList[invite.sport.name] = []
-            inviteList[invite.sport.name].append(formattedInvite)
+                inviteList.insert(invite.sport.name, [])
+            prevList = inviteList[invite.sport.name]
+            inviteList.insert(invite.sport.name, prevList.append(formattedInvite))
         if inviteList != {}:
             return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
         else:

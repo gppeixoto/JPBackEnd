@@ -301,7 +301,9 @@ def getInvites(request):
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
             prevList = inviteList.get(invite.sport.name, [])
-            inviteList[invite.sport.name] = prevList.append(formattedInvite)
+            prevList.append(formattedInvite)
+            inviteList[invite.sport.name] = prevList
+            print inviteList[invite.sport.name]
         if inviteList != {}:
             return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
         else:
@@ -369,7 +371,7 @@ def testLogin(request):
 
 def testCreateEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'localizationName' : 'CIn - UFPE',
         'localizationAddress' : 'Av. Jornalista Anibal Fernandes',
         'city' : 'Recife',
@@ -476,9 +478,9 @@ def testComment(request):
 
 def testInvite(request):
     data = {
-        'event_id' : 1,
-        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id,
-        'user_id_list' : [Profile.objects.get(facebook_name='Lucas Lima').facebook_id]
+        'event_id' : 3,
+        'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
+        'user_id_list' : [Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id]
     }
     return viewTester(data, 'invite/')
 

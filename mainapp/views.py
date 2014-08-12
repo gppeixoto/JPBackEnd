@@ -300,7 +300,8 @@ def getInvites(request):
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
-            if inviteList[invite.sport.name] is None:
+            inviteList[invite.sport.name]
+            if invite.sport.name in inviteList == False:
                 inviteList[invite.sport.name] = []
             inviteList[invite.sport.name].append(formattedInvite)
         if inviteList != {}:

@@ -15,6 +15,9 @@ def get_image_path(instance, filename):
 def getUserImageUrl(fb_id):
     return "https://graph.facebook.com/" + str(fb_id) + "/picture"
 
+def getUserImageUrlProfile(fb_id):
+    return "https://graph.facebook.com/" + str(fb_id) + "/picture?type=large"
+
 class Profile(FacebookModel):
     user = models.OneToOneField(User)
     notifications = models.BooleanField(default=True)
@@ -49,7 +52,7 @@ class Profile(FacebookModel):
         tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
-        return {"id": self.facebook_id, "name" : self.facebook_name, "url" : getUserImageUrl(self.facebook_id),
+        return {"id": self.facebook_id, "name" : self.facebook_name, "url" : getUserImageUrlProfile(self.facebook_id),
                 "ratings" : ratingsInformation, "tags" : tagsInformation,
                 "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}

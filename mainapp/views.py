@@ -105,7 +105,7 @@ def getMatchedEvents(request):
         retSortedEvents = []
         for nextId in toSortArray:
             actDict = retEvents[nextId[1]]
-            actDict['localizationDistance'] = nextId[0]
+            actDict['localizationDistance'] = nextId[0] / 1000
             retSortedEvents.append(actDict)
     else:
         retSortedEvents = retEvents
@@ -312,6 +312,8 @@ def getInvites(request):
             formattedDate = invite.date.strftime("%d/%m")
             if invite.date < datetime.datetime.today().date():
                 continue
+            if profile in invite.persons.all():
+                continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
             prevList = inviteList.get(invite.sport.name, [])
@@ -366,8 +368,8 @@ def viewTester(data, url):
 
 def testGetMatchedEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
-        'address' : "R. Estrela - Casa Amarela, Recife - Pernambuco",
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'address' : "Centro de Informatica - UFPE",
         'date' : "",
         'start_time' : "",
         'end_time' : "",
@@ -385,7 +387,7 @@ def testLogin(request):
 
 def testCreateEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
         'localizationName' : 'Casa do Rato',
         'localizationAddress' : 'Av. Boa Viagem, 3650',
         'city' : 'Recife',
@@ -424,8 +426,8 @@ def testEditEvent(request):
 
 def testEnterEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
-        'id' : 2
+        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
+        'id' : 4
     }
 
     return viewTester(data, 'enterevent/')
@@ -492,8 +494,8 @@ def testComment(request):
 
 def testInvite(request):
     data = {
-        'event_id' : 3,
-        'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
+        'event_id' : 4,
+        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id,
         'user_id_list' : [Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id]
     }
     return viewTester(data, 'invite/')
@@ -506,7 +508,7 @@ def testgetFriends(request):
 
 def testGetInvites(request):
     data = {
-        'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
+        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
     }
     return viewTester(data, 'getinvites/')
 

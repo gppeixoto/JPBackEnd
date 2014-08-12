@@ -300,10 +300,13 @@ def getInvites(request):
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
-            if inviteList[invite.sport] is None:
-                inviteList[invite.sport] = []
-            inviteList[invite.sport].append(formattedInvite)
-        return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
+            if inviteList[invite.sport.name] is None:
+                inviteList[invite.sport.name] = []
+            inviteList[invite.sport.name].append(formattedInvite)
+        if inviteList != {}:
+            return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'no invites for you':'no invites for you'}), content_type="application/json")
     except Event.DoesNotExist:
         return HttpResponse(json.dumps({'no invites for you':'no invites for you'}), content_type="application/json")
 
@@ -474,9 +477,9 @@ def testComment(request):
 
 def testInvite(request):
     data = {
-        'event_id' : 4,
-        'id' : 724231594302199,
-        'user_id_list' : [687719994632948]
+        'event_id' : 1,
+        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id,
+        'user_id_list' : [Profile.objects.get(facebook_name='Lucas Lima').facebook_id]
     }
     return viewTester(data, 'invite/')
 

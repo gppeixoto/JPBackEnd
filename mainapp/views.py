@@ -64,8 +64,11 @@ def getFutureEvents(request):
     data = json.loads(request.read())
     access_token = data['access_token']
     events = Event.objects.filter(date__gte=str(datetime.datetime.today().date()))
+
     profile, fb_user = connect(request, access_token)
-    retEvents = [event.getEvent(fb_user) for event in events]
+    publicEvents = events.filter(private=False)
+    visibleEvents = events.filter(private=True, visible=profile)
+    retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
     return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
@@ -95,7 +98,8 @@ def getMatchedEvents(request):
         toSortArray = []
         i = 0
         for event in retEvents:
-            toSortArray.append((getDistance(qAddress, event['localizationAddress']), i))
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(qAddress, completeLocalization), i))
             i += 1
         toSortArray.sort()
         retSortedEvents = []

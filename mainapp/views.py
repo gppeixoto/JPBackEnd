@@ -79,7 +79,7 @@ def getMatchedEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
-    
+
     qAddress = data['address']
     if qAddress != "":
         toSortArray = []
@@ -95,8 +95,6 @@ def getMatchedEvents(request):
             retSortedEvents.append(actDict)
     else:
         retSortedEvents = retEvents
-
-    
 
     '''
     try:
@@ -289,6 +287,26 @@ def getFriends(request):
             listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId)))
     return HttpResponse(json.dumps({'friends':listFriends}), content_type="application/json")
 
+def getInvites(request):
+    data = json.loads(request.read())
+    uId = data['id']
+    profile = Profile.objects.get(facebook_id=uId)
+    try:
+        invites = Event.objects.get(visible=profile)
+        inviteList = {}
+        for invite in invites:
+            formattedDate = invite.date.strftime("%d/%m")
+            if formattedDate < datetime.datetime.today().date():
+                continue
+            formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
+            formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
+            if inviteList[invite.sport] is None:
+                inviteList[invite.sport] = []
+            inviteList[invite.sport].append(formattedInvite)
+        return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
+    except Event.DoesNotExist:
+        return HttpResponse(json.dumps({'no invites for you':'no invites for you'}), content_type="application/json")
+
 #going to front-end
 '''
 def getAddresses(request):
@@ -311,6 +329,11 @@ def getAddresses(request):
         formattedAddresses.append(address['formatted_address'])
     return HttpResponse(json.dumps({'formatted_addresses':formattedAddresses}))
 '''
+
+
+
+
+
 
 # sends a http post to the url that we want to test,
 # simulating future uses
@@ -463,6 +486,12 @@ def testgetFriends(request):
     }
     return viewTester(data, 'getfriends/')
 
+def testGetInvites(request):
+    data = {
+        'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
+    }
+    return viewTester(data, 'getinvites/')
+
 #going to front-end
 '''
 def testGetAddresses(request):
@@ -474,7 +503,3 @@ def testGetAddresses(request):
     }
     return viewTester(data, 'getaddresses/')
 '''
-
-def testaailuqueto(request):
-  data = urllib2.urlopen("http://maps.googleapis.com/maps/api/distancematrix/json?origins=Rua+Jeronimo+Vilela+118+PE&destinations=Centro+de+Informatica+PE&language=pt").read()
-  return HttpResponse(json.dumps(data), content_type="application/json")

@@ -292,7 +292,7 @@ def getInvites(request):
     uId = data['id']
     profile = Profile.objects.get(facebook_id=uId)
     try:
-        invites = Event.objects.get(visible=profile)
+        invites = Event.objects.filter(visible=profile)
         inviteList = {}
         for invite in invites:
             formattedDate = invite.date.strftime("%d/%m")

@@ -18,8 +18,8 @@ from util import *
 
 # Create your views here.
 
-url_base = "http://join-play.herokuapp.com/"
-# url_base = "http://localhost:8000/"
+# url_base = "http://join-play.herokuapp.com/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -300,9 +300,7 @@ def getInvites(request):
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
             formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
-            if invite.sport.name in inviteList == False:
-                inviteList.insert(invite.sport.name, [])
-            prevList = inviteList[invite.sport.name]
+            prevList = inviteList.get(invite.sport.name, [])
             inviteList.insert(invite.sport.name, prevList.append(formattedInvite))
         if inviteList != {}:
             return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")

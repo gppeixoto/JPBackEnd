@@ -20,8 +20,8 @@ from util import *
 
 # Create your views here.
 
-# url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+url_base = "http://join-play.herokuapp.com/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -69,6 +69,24 @@ def getFutureEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     retEvents = [event.getEvent(fb_user) for event in (publicEvents | visibleEvents).distinct()]
+
+    if 'localization' in data:
+        localization = data['localization']
+        toSortArray = []
+        i = 0
+        for event in retEvents:
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(localization, completeLocalization), i))
+            i += 1
+        toSortArray.sort()
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = retEvents[nextId[1]]
+            actDict['localizationDistance'] = nextId[0] / 1000
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = retEvents
+
     return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
@@ -270,10 +288,10 @@ def comment(request):
     new_comment.save()
     foto = getUserImageUrl(profile.image)
     nome = profile.facebook_name
-    time = new_comment.time
-    day = new_comment.day
+    time = new_comment.time.strftime("%H:%M")
+    day = new_comment.day.strftime("%d/%m")
     return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":str(time),"day":str(day)}), content_type="application/json")
-    
+
 def invite(request):
     data = json.loads(request.read())
     listUsers = data['user_id_list']
@@ -516,7 +534,8 @@ def testGetInvites(request):
 
 def testGetFutureEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localization' : '-8.039573000000001,-34.899502'
     }
     return viewTester(data, 'getfutureevents/')
 

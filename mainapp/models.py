@@ -70,6 +70,8 @@ class Sport(models.Model):
     name = models.CharField(max_length=30)
     ratings = models.ManyToManyField(Profile, through='Rating')
     icon = models.ImageField(upload_to=get_image_path, blank=True, null=True)
+    def __unicode__(self):
+        return self.name
 
 class Rating(models.Model):
     person = models.ForeignKey(Profile)

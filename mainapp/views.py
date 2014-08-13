@@ -85,7 +85,7 @@ def getMatchedEvents(request):
         events = events.filter(timeEnd__lte=qTimeEnd)
     qSport = data['sports']
     if qSport != []:
-        sports = [Sport.objects.get(name=sport) for sport in qSport if len(Sport.objects.filter(name=sport)) != 0]
+        sports = [Sport.objects.get(name__iexact=sport) for sport in qSport if len(Sport.objects.filter(name__iexact=sport)) != 0]
         print sports
         events = events.filter(sport__in=sports)
     access_token = data['access_token']
@@ -374,7 +374,7 @@ def testGetMatchedEvents(request):
         'date' : "",
         'start_time' : "",
         'end_time' : "",
-        'sports' : ['Futebol', ' ']
+        'sports' : ['Ping Pong', ' ']
     }
 
     return viewTester(data, 'getmatchedevents/')

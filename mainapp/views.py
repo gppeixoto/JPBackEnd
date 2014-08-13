@@ -40,6 +40,26 @@ def userAgenda(request):
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
+
+    if 'localization' in data:
+        localization = data['localization']
+        toSortArray = []
+        i = 0
+        for event in eventList:
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(localization, completeLocalization), i))
+            i += 1
+        toSortArray.sort()
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = eventList[nextId[1]]
+            actDict['localizationDistance'] = nextId[0] / 1000
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = eventList
+
+    return HttpResponse(json.dumps({'events' : eventList}), content_type="application/json")
+
     return HttpResponse(json.dumps(eventList), content_type="application/json")
 
 def userProfile(request):
@@ -531,6 +551,13 @@ def testGetInvites(request):
         'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
     }
     return viewTester(data, 'getinvites/')
+
+def testUserAgenda(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localization' : '-8.039573000000001,-34.899502'
+    }
+    return viewTester(data, 'getfutureevents/')
 
 def testGetFutureEvents(request):
     data = {

@@ -488,9 +488,9 @@ def testGetEvent(request):
 
 def testComment(request):
     data = {
-        'event_id' : ,
-        'user_id' : 628143283960150,
-        'comment' : 'Oba!'
+        'event_id' : '1',
+        'user_id' : '687719994632948',
+        'comment' : 'Blah'
     }
     return viewTester(data, 'comment/')
 

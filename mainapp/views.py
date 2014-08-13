@@ -85,7 +85,8 @@ def getMatchedEvents(request):
         events = events.filter(timeEnd__lte=qTimeEnd)
     qSport = data['sports']
     if qSport != []:
-        sports = [Sport.objects.get(name=sport) for sport in qSport]
+        sports = [Sport.objects.get(name=sport) for sport in qSport if Sport.objects.filter(name=sport) != []]
+        print sports
         events = events.filter(sport__in=sports)
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
@@ -373,7 +374,7 @@ def testGetMatchedEvents(request):
         'date' : "",
         'start_time' : "",
         'end_time' : "",
-        'sports' : []
+        'sports' : ['Futebol']
     }
 
     return viewTester(data, 'getmatchedevents/')
@@ -387,18 +388,18 @@ def testLogin(request):
 
 def testCreateEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
-        'localizationName' : 'Casa do Rato',
-        'localizationAddress' : 'Av. Boa Viagem, 3650',
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localizationName' : 'Casa de Bertha',
+        'localizationAddress' : 'Rua Amaro de Soares de Andrade',
         'city' : 'Recife',
-        'neighbourhood' : 'Boa Viagem',
-        'eventSport' : 'Futebol',
-        'eventDay' : '2014-08-18',
+        'neighbourhood' : 'Piedade',
+        'eventSport' : 'Jogos de Tabuleiro',
+        'eventDay' : '2014-09-13',
         'eventTimeBegin' : '14:00',
-        'eventTimeEnd' : '16:00',
-        'eventDescription' : 'Pelada de Rafinha',
-        'eventName' : u'Futébol na Casa do Rato',
-        'eventPrice' : '0.00',
+        'eventTimeEnd' : '19:00',
+        'eventDescription' : 'Vamos fechar o contest e ficar jogando xadrez.',
+        'eventName' : 'Xadrez na Subregional',
+        'eventPrice' : '60.00',
         'private' : True,
     }
 
@@ -465,8 +466,8 @@ def testVoteInTagUser(request):
 def testRateUser(request):
     data = {
         'sport' : 'Ping Pong',
-        'value' : 3.0,
-        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
+        'value' : 1.5,
+        'id' : 4581888122223
     }
 
     return viewTester(data, 'rateuser/')
@@ -494,8 +495,8 @@ def testComment(request):
 
 def testInvite(request):
     data = {
-        'event_id' : 4,
-        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id,
+        'event_id' : 14,
+        'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
         'user_id_list' : [Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id]
     }
     return viewTester(data, 'invite/')

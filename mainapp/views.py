@@ -20,8 +20,8 @@ from util import *
 
 # Create your views here.
 
-url_base = "http://join-play.herokuapp.com/"
-# url_base = "http://localhost:8000/"
+# url_base = "http://join-play.herokuapp.com/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -68,7 +68,7 @@ def getFutureEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in publicEvents]
+    retEvents = [event.getEvent(fb_user) for event in (publicEvents | visibleEvents).distinct()]
     return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
@@ -93,7 +93,7 @@ def getMatchedEvents(request):
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
     print publicEvents
-    retEvents = [event.getEvent(fb_user) for event in publicEvents]
+    retEvents = [event.getEvent(fb_user) for event in (publicEvents | visibleEvents).distinct()]
 
     qAddress = data['address']
     if qAddress != "":
@@ -272,8 +272,8 @@ def comment(request):
     nome = profile.facebook_name
     time = new_comment.time
     day = new_comment.day
-    # return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":time,"day":day}), content_type="application/json")
-    return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
+    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":str(time),"day":str(day)}), content_type="application/json")
+    
 def invite(request):
     data = json.loads(request.read())
     listUsers = data['user_id_list']

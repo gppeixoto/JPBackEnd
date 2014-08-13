@@ -126,6 +126,8 @@ class Event(models.Model):
     private = models.BooleanField()
     visible = models.ManyToManyField(Profile, related_name="visible", null=True)
 
+    def __unicode__(self):
+        return self.name
 
     def getEvent(self, fb_user):
         participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]

@@ -92,7 +92,8 @@ def getMatchedEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
+    print publicEvents
+    retEvents = [event.getEvent(fb_user) for event in publicEvents]
 
     qAddress = data['address']
     if qAddress != "":
@@ -271,8 +272,8 @@ def comment(request):
     nome = profile.facebook_name
     time = new_comment.time
     day = new_comment.day
-    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":time,"day":day}), content_type="application/json")
-
+    # return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":time,"day":day}), content_type="application/json")
+    return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
 def invite(request):
     data = json.loads(request.read())
     listUsers = data['user_id_list']
@@ -374,7 +375,7 @@ def testGetMatchedEvents(request):
         'date' : "",
         'start_time' : "",
         'end_time' : "",
-        'sports' : ['Ping Pong', ' ']
+        'sports' : ['xadrez']
     }
 
     return viewTester(data, 'getmatchedevents/')
@@ -389,11 +390,11 @@ def testLogin(request):
 def testCreateEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'localizationName' : 'Casa de Bertha',
-        'localizationAddress' : 'Rua Amaro de Soares de Andrade',
+        'localizationName' : 'UFPE',
+        'localizationAddress' : 'Av. Jorn. Aníbal Fernandes',
         'city' : 'Recife',
-        'neighbourhood' : 'Piedade',
-        'eventSport' : 'Jogos de Tabuleiro',
+        'neighbourhood' : 'Cidade Universitaria',
+        'eventSport' : '',
         'eventDay' : '2014-09-13',
         'eventTimeBegin' : '14:00',
         'eventTimeEnd' : '19:00',
@@ -487,7 +488,7 @@ def testGetEvent(request):
 
 def testComment(request):
     data = {
-        'event_id' : 1,
+        'event_id' : ,
         'user_id' : 628143283960150,
         'comment' : 'Oba!'
     }

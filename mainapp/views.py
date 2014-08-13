@@ -68,7 +68,7 @@ def getFutureEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
+    retEvents = [event.getEvent(fb_user) for event in publicEvents]
     return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):

@@ -591,7 +591,7 @@ def testGetAddresses(request):
 '''
 
 
-def aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa(request):
+def aaa(request):
     bla = Event.objects.all()
     for maria in bla:
         maria.lat = None

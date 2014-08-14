@@ -83,7 +83,7 @@ def userProfileId(request):
 def getFutureEvents(request):
     data = json.loads(request.read())
     access_token = data['access_token']
-    events = Event.objects.filter(date__gte=str(datetime.datetime.today().date()))
+    events = Event.objects.filter(date__gte=str(datetime.datetime.today().date()), opened=True)
 
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
@@ -111,7 +111,7 @@ def getFutureEvents(request):
 
 def getMatchedEvents(request):
     data = json.loads(request.read())
-    events = Event.objects.all()
+    events = Event.objects.filter(opened=True)
     qDate = data['date']
     if qDate != "":
         events = events.filter(date__gte=qDate)

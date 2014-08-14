@@ -169,7 +169,7 @@ class Event(models.Model):
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
-                "private" : self.private}
+                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood}
 
 class Comment(models.Model):
     event = models.ForeignKey(Event)

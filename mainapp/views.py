@@ -21,7 +21,7 @@ from util import *
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-# url_base = "http://localhost:8000/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -435,13 +435,13 @@ def testLogin(request):
 
 def testCreateEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'localizationName' : 'UFPE',
         'localizationAddress' : 'Av. Jorn. Aníbal Fernandes',
         'city' : 'Recife',
         'neighbourhood' : 'Cidade Universitaria',
         'eventSport' : 'Ping Pong',
-        'eventDay' : '2014-09-15',
+        'eventDay' : '2014-12-12',
         'eventTimeBegin' : '14:30',
         'eventTimeEnd' : '19:00',
         'eventDescription' : 'Bla bla bla',
@@ -532,7 +532,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 1
+        'id' : 4
     }
     return viewTester(data, 'getevent/')
 
@@ -589,3 +589,12 @@ def testGetAddresses(request):
     }
     return viewTester(data, 'getaddresses/')
 '''
+
+
+def aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa(request):
+    bla = Event.objects.all()
+    for maria in bla:
+        maria.lat = None
+        maria.lng = None
+        maria.save()
+    return HttpResponse(json.dumps({"aaa":"aaa"}), content_type='application/json')

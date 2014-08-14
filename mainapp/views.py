@@ -589,12 +589,3 @@ def testGetAddresses(request):
     }
     return viewTester(data, 'getaddresses/')
 '''
-
-
-def aaa(request):
-    bla = Event.objects.all()
-    for maria in bla:
-        maria.lat = None
-        maria.lng = None
-        maria.save()
-    return HttpResponse(json.dumps({"aaa":"aaa"}), content_type='application/json')

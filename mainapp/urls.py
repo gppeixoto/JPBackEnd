@@ -42,5 +42,6 @@ urlpatterns = patterns('mainapp.views',
     url(r'^testgetaddresses/$', 'testGetAddresses', name = 'testGetAddresses'),
     url(r'^testgetdistance/$', 'testGetDistance', name = 'testGetDistance'),
     url(r'^testgetinvites/$', 'testGetInvites', name = 'testGetInvites'),
+    url(r'^testuseragenda/$', 'testUserAgenda', name = 'testUserAgenda'),
     url(r'^testgetfutureevents/$', 'testGetFutureEvents', name = 'testGetFutureEvents'),
 )

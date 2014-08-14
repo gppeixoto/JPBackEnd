@@ -40,6 +40,26 @@ def userAgenda(request):
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
+
+    if 'localization' in data:
+        localization = data['localization']
+        toSortArray = []
+        i = 0
+        for event in eventList:
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(localization, completeLocalization), i))
+            i += 1
+        toSortArray.sort()
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = eventList[nextId[1]]
+            actDict['localizationDistance'] = nextId[0] / 1000
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = eventList
+
+    return HttpResponse(json.dumps({'events' : eventList}), content_type="application/json")
+
     return HttpResponse(json.dumps(eventList), content_type="application/json")
 
 def userProfile(request):
@@ -68,7 +88,25 @@ def getFutureEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
+    retEvents = [event.getEvent(fb_user) for event in (publicEvents | visibleEvents).distinct()]
+
+    if 'localization' in data:
+        localization = data['localization']
+        toSortArray = []
+        i = 0
+        for event in retEvents:
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(localization, completeLocalization), i))
+            i += 1
+        toSortArray.sort()
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = retEvents[nextId[1]]
+            actDict['localizationDistance'] = nextId[0] / 1000
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = retEvents
+
     return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
@@ -92,7 +130,8 @@ def getMatchedEvents(request):
     profile, fb_user = connect(request, access_token)
     publicEvents = events.filter(private=False)
     visibleEvents = events.filter(private=True, visible=profile)
-    retEvents = [event.getEvent(fb_user) for event in publicEvents | visibleEvents]
+    print publicEvents
+    retEvents = [event.getEvent(fb_user) for event in (publicEvents | visibleEvents).distinct()]
 
     qAddress = data['address']
     if qAddress != "":
@@ -269,9 +308,9 @@ def comment(request):
     new_comment.save()
     foto = getUserImageUrl(profile.image)
     nome = profile.facebook_name
-    time = new_comment.time
-    day = new_comment.day
-    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":time,"day":day}), content_type="application/json")
+    time = new_comment.time.strftime("%H:%M")
+    day = new_comment.day.strftime("%d/%m")
+    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":str(time),"day":str(day)}), content_type="application/json")
 
 def invite(request):
     data = json.loads(request.read())
@@ -374,7 +413,7 @@ def testGetMatchedEvents(request):
         'date' : "",
         'start_time' : "",
         'end_time' : "",
-        'sports' : ['Ping Pong', ' ']
+        'sports' : ['xadrez']
     }
 
     return viewTester(data, 'getmatchedevents/')
@@ -389,11 +428,11 @@ def testLogin(request):
 def testCreateEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'localizationName' : 'Casa de Bertha',
-        'localizationAddress' : 'Rua Amaro de Soares de Andrade',
+        'localizationName' : 'UFPE',
+        'localizationAddress' : 'Av. Jorn. Aníbal Fernandes',
         'city' : 'Recife',
-        'neighbourhood' : 'Piedade',
-        'eventSport' : 'Jogos de Tabuleiro',
+        'neighbourhood' : 'Cidade Universitaria',
+        'eventSport' : '',
         'eventDay' : '2014-09-13',
         'eventTimeBegin' : '14:00',
         'eventTimeEnd' : '19:00',
@@ -487,9 +526,9 @@ def testGetEvent(request):
 
 def testComment(request):
     data = {
-        'event_id' : 1,
-        'user_id' : 628143283960150,
-        'comment' : 'Oba!'
+        'event_id' : '1',
+        'user_id' : '687719994632948',
+        'comment' : 'Blah'
     }
     return viewTester(data, 'comment/')
 
@@ -513,9 +552,17 @@ def testGetInvites(request):
     }
     return viewTester(data, 'getinvites/')
 
+def testUserAgenda(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localization' : '-8.039573000000001,-34.899502'
+    }
+    return viewTester(data, 'getfutureevents/')
+
 def testGetFutureEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localization' : '-8.039573000000001,-34.899502'
     }
     return viewTester(data, 'getfutureevents/')
 

@@ -125,6 +125,8 @@ class Event(models.Model):
     description = models.CharField(max_length=2000)
     private = models.BooleanField()
     visible = models.ManyToManyField(Profile, related_name="visible", null=True)
+    lat = models.DecimalField(decimal_places=7, max_digits=10)
+    lng = models.DecimalField(decimal_places=7, max_digits=10)
 
     def __unicode__(self):
         return self.name
@@ -169,7 +171,8 @@ class Event(models.Model):
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
-                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood}
+                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
+                "latitude":str(self.lat), "longitude":str(self.lng)}
 
 class Comment(models.Model):
     event = models.ForeignKey(Event)

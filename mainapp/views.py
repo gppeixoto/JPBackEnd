@@ -214,9 +214,11 @@ def createEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
+    lat = data['latitude']
+    lng = data['longitude']
     newEvent = Event(name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
-                    price=eventPrice,private=private)
+                    price=eventPrice,private=private, lat=lat, lng=lng)
     newEvent.save()
     id = newEvent.id;
     newEvent.persons.add(profile)
@@ -244,13 +246,15 @@ def editEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
+    lat = data['latitude']
+    lng = data['longitude']
     id = data['id']
     event = Event.objects.get(id=id)
     if event.creatorProfile.facebook_id != profile.facebook_id:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
     newEvent = Event(id=id,name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
-                    price=eventPrice,private=private)
+                    price=eventPrice,private=private,lat=lat,lng=lng)
     newEvent.save()
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
@@ -427,26 +431,28 @@ def testLogin(request):
 
 def testCreateEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
         'localizationName' : 'UFPE',
         'localizationAddress' : 'Av. Jorn. Aníbal Fernandes',
         'city' : 'Recife',
         'neighbourhood' : 'Cidade Universitaria',
-        'eventSport' : '',
-        'eventDay' : '2014-09-13',
-        'eventTimeBegin' : '14:00',
+        'eventSport' : 'Ping Pong',
+        'eventDay' : '2014-09-15',
+        'eventTimeBegin' : '14:30',
         'eventTimeEnd' : '19:00',
-        'eventDescription' : 'Vamos fechar o contest e ficar jogando xadrez.',
+        'eventDescription' : 'Bla bla bla',
         'eventName' : 'Xadrez na Subregional',
         'eventPrice' : '60.00',
         'private' : True,
+        'latitude': '-8.039573000000001',
+        'longitude': '-34.899502'
     }
 
     return viewTester(data, 'createevent/')
 
 def testEditEvent(request):
     data = {
-        'access_token' : 'CAAJ6iZBGS5FIBAPnlmlZBMC5K450EzoaZC44mBmlhWPwZBRkzi6BVBZC96gP5YE8qa9ArODtxPqVLkEj8eqiHdXcyrvvG9rZCnKjtOanZCf5ewq3CiHy6am1PYZC8f1CP7gOVT1o6jBwOZA2ff1JyZBMXZBY7wDnvH2w1orhuP575UZAoCSRvzX9s6LfAKg6LMsyZCiIZD',
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
         'localizationName' : 'CIn - UFPE',
         'localizationAddress' : 'Av. Jornalista Anibal Fernandes',
         'city' : 'Recife',
@@ -459,7 +465,9 @@ def testEditEvent(request):
         'eventName' : 'Campeonato de Ping pong do Join&Play',
         'eventPrice' : '0.00',
         'private' : False,
-        'id' : '6',
+        'latitude': '-8.04973000000001',
+        'longitude': '-34.899502',
+        'id' : '3'
     }
 
     return viewTester(data, 'editevent/')
@@ -520,7 +528,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 1
+        'id' : 3
     }
     return viewTester(data, 'getevent/')
 

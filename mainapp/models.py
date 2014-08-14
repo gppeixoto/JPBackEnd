@@ -125,8 +125,8 @@ class Event(models.Model):
     description = models.CharField(max_length=2000)
     private = models.BooleanField()
     visible = models.ManyToManyField(Profile, related_name="visible", null=True)
-    lat = models.DecimalField(decimal_places=7, max_digits=10, null=True)
-    lng = models.DecimalField(decimal_places=7, max_digits=10, null=True)
+    lat = models.DecimalField(decimal_places=7, max_digits=10, blank=True, null=True)
+    lng = models.DecimalField(decimal_places=7, max_digits=10, blank=True, null=True)
     opened = models.BooleanField(default=True)
 
     def __unicode__(self):

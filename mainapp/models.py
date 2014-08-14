@@ -171,13 +171,14 @@ class Event(models.Model):
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
-                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood }
+                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
+                "creatorID" : self.creatorProfile.facebook_id }
         if self.lat is not None:
             ret['latitude'] = str(self.lat)
         if self.lng is not None:
             ret['longitude'] = str(self.lng)
         return ret
-        
+
 class Comment(models.Model):
     event = models.ForeignKey(Event)
     person = models.ForeignKey(Profile)

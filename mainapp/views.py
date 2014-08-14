@@ -326,8 +326,9 @@ def invite(request):
     evtId = data['event_id']
     userId = data['id']
     event = Event.objects.get(id=evtId)
-    if event.creatorProfile.facebook_id != userId:
-        return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
+    # project decision
+    # if event.creatorProfile.facebook_id != userId:
+    #   return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
     for user_id in listUsers:
         profile = Profile.objects.get(facebook_id=user_id)
         event.visible.add(profile)

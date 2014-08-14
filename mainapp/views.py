@@ -21,7 +21,7 @@ from util import *
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -382,7 +382,7 @@ def closeEvent(request):
     event = Event.objects.get(id=eventId)
     event.opened = False
     event.save()
-    return HttpResponse(json.dumps{"closed" : "closed"}, content_type="application/json")
+    return HttpResponse(json.dumps({"closed" : "closed"}), content_type="application/json")
 
 #going to front-end
 '''
@@ -586,6 +586,12 @@ def testGetFutureEvents(request):
         'localization' : '-8.039573000000001,-34.899502'
     }
     return viewTester(data, 'getfutureevents/')
+
+def testCloseEvent(request):
+    data = {
+        'id' : 1
+    }
+    return viewTester(data, 'closeEvent/')
 
 #going to front-end
 '''

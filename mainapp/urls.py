@@ -45,4 +45,5 @@ urlpatterns = patterns('mainapp.views',
     url(r'^testgetinvites/$', 'testGetInvites', name = 'testGetInvites'),
     url(r'^testuseragenda/$', 'testUserAgenda', name = 'testUserAgenda'),
     url(r'^testgetfutureevents/$', 'testGetFutureEvents', name = 'testGetFutureEvents'),
+    url(r'^testcloseevent/$', 'testCloseEvent', name = 'testCloseEvent'),
 )

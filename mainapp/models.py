@@ -125,8 +125,8 @@ class Event(models.Model):
     description = models.CharField(max_length=2000)
     private = models.BooleanField()
     visible = models.ManyToManyField(Profile, related_name="visible", null=True)
-    lat = models.DecimalField(decimal_places=7, max_digits=10)
-    lng = models.DecimalField(decimal_places=7, max_digits=10)
+    lat = models.DecimalField(decimal_places=7, max_digits=10, null=True)
+    lng = models.DecimalField(decimal_places=7, max_digits=10, null=True)
 
     def __unicode__(self):
         return self.name
@@ -167,13 +167,17 @@ class Event(models.Model):
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
-        return {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
+        ret = {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
-                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
-                "latitude":str(self.lat), "longitude":str(self.lng)}
-
+                "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood }
+        if self.lat is not None:
+            ret['latitude'] = str(self.lat)
+        if self.lng is not None:
+            ret['longitude'] = str(self.lng)
+        return ret
+        
 class Comment(models.Model):
     event = models.ForeignKey(Event)
     person = models.ForeignKey(Profile)

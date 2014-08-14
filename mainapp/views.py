@@ -214,11 +214,13 @@ def createEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
-    lat = data['latitude']
-    lng = data['longitude']
     newEvent = Event(name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
-                    price=eventPrice,private=private, lat=lat, lng=lng)
+                    price=eventPrice,private=private)
+    if 'latitude' in data:
+        newEvent.lat = data['latitude']
+    if 'longitude' in data:
+        newEvent.lng = data['longitude']
     newEvent.save()
     id = newEvent.id;
     newEvent.persons.add(profile)
@@ -246,15 +248,17 @@ def editEvent(request):
     eventName = data['eventName']
     eventPrice = Decimal(data['eventPrice'])
     private = data['private']
-    lat = data['latitude']
-    lng = data['longitude']
     id = data['id']
     event = Event.objects.get(id=id)
     if event.creatorProfile.facebook_id != profile.facebook_id:
         return HttpResponse(json.dumps({"error":"error"}), content_type="application/json")
     newEvent = Event(id=id,name=eventName, creatorProfile=profile, description=eventDescription, localization=eventLocalization,
                     sport=eventSport, date=eventDay, timeBegin=eventTimeBegin, timeEnd=eventTimeEnd,
-                    price=eventPrice,private=private,lat=lat,lng=lng)
+                    price=eventPrice,private=private)
+    if 'latitude' in data:
+        newEvent.lat = data['latitude']
+    if 'longitude' in data:
+        newEvent.lng = data['longitude']
     newEvent.save()
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
@@ -528,7 +532,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 3
+        'id' : 1
     }
     return viewTester(data, 'getevent/')
 

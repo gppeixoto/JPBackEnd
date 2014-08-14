@@ -376,6 +376,14 @@ def getInvites(request):
     except Event.DoesNotExist:
         return HttpResponse(json.dumps({'no invites for you':'no invites for you'}), content_type="application/json")
 
+def closeEvent(request):
+    data = json.loads(request.read())
+    eventId = data['id']
+    event = Event.objects.get(id=eventId)
+    event.opened = False
+    event.save()
+    return HttpResponse(json.dumps{"closed" : "closed"}, content_type="application/json")
+
 #going to front-end
 '''
 def getAddresses(request):

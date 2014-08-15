@@ -17,6 +17,7 @@ from django.shortcuts import render, redirect
 import urllib2
 import urllib
 from util import *
+from settings import APP_CURRENT_VERSION
 
 # Create your views here.
 
@@ -385,7 +386,7 @@ def closeEvent(request):
     return HttpResponse(json.dumps({"closed" : "closed"}), content_type="application/json")
 
 def getVersion(request):
-    return HttpResponse(json.dumps({"version" : settings.APP_CURRENT_VERSION}))
+    return HttpResponse(json.dumps({"version" : APP_CURRENT_VERSION}))
 
 #going to front-end
 '''

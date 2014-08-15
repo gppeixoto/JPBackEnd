@@ -168,12 +168,18 @@ class Event(models.Model):
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
+        isParticipating = False
+        uid = fb_user.facebook_profile_data()['id']
+        for participant in participants:
+            if str(participant[0]) == str(uid):
+                isParticipating = True
+                break
         ret = {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
                 "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
-                "creatorID" : self.creatorProfile.facebook_id }
+                "creatorID" : self.creatorProfile.facebook_id, "isParticipating" : isParticipating }
         if self.lat is not None:
             ret['latitude'] = str(self.lat)
         if self.lng is not None:

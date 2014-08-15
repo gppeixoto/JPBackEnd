@@ -407,11 +407,6 @@ def getAddresses(request):
     return HttpResponse(json.dumps({'formatted_addresses':formattedAddresses}))
 '''
 
-
-
-
-
-
 # sends a http post to the url that we want to test,
 # simulating future uses
 def viewTester(data, url):
@@ -540,8 +535,8 @@ def testHeroku(request):
 
 def testGetEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 4
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'id' : 1
     }
     return viewTester(data, 'getevent/')
 

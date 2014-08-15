@@ -384,6 +384,9 @@ def closeEvent(request):
     event.save()
     return HttpResponse(json.dumps({"closed" : "closed"}), content_type="application/json")
 
+def getVersion(request):
+    return HttpResponse(json.dumps({"version" : APP_CURRENT_VERSION}))
+
 #going to front-end
 '''
 def getAddresses(request):
@@ -536,7 +539,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
-        'id' : 1
+        'id' : 4
     }
     return viewTester(data, 'getevent/')
 
@@ -587,6 +590,10 @@ def testCloseEvent(request):
         'id' : 1
     }
     return viewTester(data, 'closeEvent/')
+
+def testGetVersion(request):
+    return viewTester(data, 'getVersion/')
+
 
 #going to front-end
 '''

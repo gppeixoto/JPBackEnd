@@ -114,6 +114,8 @@ FACEBOOK_DEFAULT_SCOPE = ['email', 'public_profile', 'user_friends']
 
 from django.conf import settings
 
+APP_CURRENT_VERSION = '0.0'
+
 import os
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 STATICFILES_DIRS = (

@@ -385,7 +385,7 @@ def closeEvent(request):
     return HttpResponse(json.dumps({"closed" : "closed"}), content_type="application/json")
 
 def getVersion(request):
-    return HttpResponse(json.dumps({"version" : APP_CURRENT_VERSION}))
+    return HttpResponse(json.dumps({"version" : settings.APP_CURRENT_VERSION}))
 
 #going to front-end
 '''
@@ -590,9 +590,6 @@ def testCloseEvent(request):
         'id' : 1
     }
     return viewTester(data, 'closeEvent/')
-
-def testGetVersion(request):
-    return viewTester(data, 'getVersion/')
 
 
 #going to front-end

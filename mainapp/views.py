@@ -17,7 +17,7 @@ from django.shortcuts import render, redirect
 import urllib2
 import urllib
 from util import *
-from settings import APP_CURRENT_VERSION
+from DatabaseJP.settings import APP_CURRENT_VERSION
 
 # Create your views here.
 

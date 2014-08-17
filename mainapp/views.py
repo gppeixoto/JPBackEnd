@@ -392,7 +392,6 @@ def getInvites(request):
             prevList = inviteList.get(invite.sport.name, [])
             prevList.append(formattedInvite)
             inviteList[invite.sport.name] = prevList
-            print inviteList[invite.sport.name]
         if inviteList != {}:
             return HttpResponse(json.dumps({'inviteList':inviteList}), content_type="application/json")
         else:
@@ -563,7 +562,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 1
+        'id' : 3
     }
     return viewTester(data, 'getevent/')
 

@@ -181,12 +181,13 @@ class Event(models.Model):
             if str(participant[0]) == str(uid):
                 hasArrived = True
                 break
+        startVoting = self.opened == False or datetime.datetime.now().date() > self.date or (datetime.datetime.now().date() == self.date and datetime.datetime.now().time() > self.timeEnd) 
         ret = {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
                 "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
-                "creatorID" : self.creatorProfile.facebook_id, "isParticipating" : isParticipating, "arrived" : arrived, "hasArrived" : hasArrived }
+                "creatorID" : self.creatorProfile.facebook_id, "isParticipating" : isParticipating, "arrived" : arrived, "hasArrived" : hasArrived, "startVoting" : startVoting}
         if self.lat is not None:
             ret['latitude'] = str(self.lat)
         if self.lng is not None:

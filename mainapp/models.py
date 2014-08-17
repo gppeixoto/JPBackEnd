@@ -45,16 +45,20 @@ class Profile(FacebookModel):
 
 
     def getUserProfile(self, fb_user):
-        sportRatings = Rating.objects.filter(person=self)
-        ratingsInformation = [(sportRating.sport.name, sportRating.rating) for sportRating in sportRatings]
-        sportsInformation = [(sport.name, Event.objects.filter(persons=self, sport=sport).count()) for sport in Sport.objects.all()]
+        sports = [(sport, Event.objects.filter(persons=self, sport=sport).count()) for sport in Sport.objects.all()]
+        ratingsInformation = []
+        for (sport, qtd) in sports:
+            rating = Rating.objects.filter(person=self, sport=sport)
+            if qtd != 0 and len(rating) != 0:
+                ratingsInformation.append((sport.name, qtd, rating[0].rating, rating[0].numberOfVoters))
+            elif qtd != 0:
+                ratingsInformation.append((sport.name, qtd, 2.5, 0))
         tags = Tag.objects.filter(person=self)
         tagsInformation = [(tag.name, tag.numberOfVoters) for tag in tags]
         friends = fb_user.get_friends()
         dbFriends = [(friend['id'], friend['name']) for friend in filter(lambda (dict): self.inProfile(dict['id']), friends)]
         return {"id": self.facebook_id, "name" : self.facebook_name, "url" : getUserImageUrlProfile(self.facebook_id),
-                "ratings" : ratingsInformation, "tags" : tagsInformation,
-                "sportsInfo" : sportsInformation, "friends" : len(dbFriends),
+                "ratings" : ratingsInformation, "tags" : tagsInformation, "friends" : len(dbFriends),
                 "notifications" : self.notifications}
 
 
@@ -92,8 +96,14 @@ class Tag(models.Model):
     numberOfVoters = models.IntegerField(default=0)
     icon = models.ImageField(upload_to=get_image_path, blank=True, null=True)
 
-    def tag(self):
+    def performTag(self):
         self.numberOfVoters += 1
+
+class Vote(models.Model):
+    voter = models.ForeignKey(Profile, related_name="voter", null=True)
+    voted = models.ForeignKey(Profile, related_name="voted", null=True)
+    tag = models.ForeignKey(Tag, related_name="tag", null=True)
+    sport = models.ForeignKey(Sport, related_name="sport", null=True)
 
 class Localization(models.Model):
     name = models.CharField(max_length=50)

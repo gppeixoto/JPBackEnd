@@ -72,13 +72,16 @@ def userProfile(request):
 
 def userProfileId(request):
     data = json.loads(request.read())
+    uId = data['uId']
     id = data['id']
     profile = Profile.objects.get(facebook_id=id)
+    userProfile = Profile.objects.get(facebook_id=uId)
     # we need to find a way to handle expiring token issues
     # saving friends in bd seems a valid idea
     access_token = profile.access_token
     fb_user = FacebookUserConverter(OpenFacebook(access_token))
     userInfo = profile.getUserProfile(fb_user)
+    userInfo = appendInfo(userInfo, profile, userProfile)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
 def getFutureEvents(request):
@@ -299,20 +302,26 @@ def deleteEvent(request):
 
 def voteInTagUser(request):
     data = json.loads(request.read())
+    voterId = data['v_id']
     userId = data['id']
     tagName = data['tag']
     profile = Profile.objects.get(facebook_id=userId)
     tag, _ = Tag.objects.get_or_create(name=tagName, person=profile)
-    tag.tag()
+    tag.performTag()
     tag.save()
+    voterProfile = Profile.objects.get(facebook_id=voterId)
+    vote = Vote(voter=voterProfile, voted=profile, tag=tag)
+    vote.save()
     # the code will loke better if we somehow call userProfileId from here
     access_token = profile.access_token
     fb_user = FacebookUserConverter(OpenFacebook(access_token))
     userInfo = profile.getUserProfile(fb_user)
+    userInfo = appendInfo(userInfo, profile, voterProfile)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
 def rateUser(request):
     data = json.loads(request.read())
+    voterId = data['v_id']
     userId = data['id']
     sportName = data['sport']
     value = data['value']
@@ -321,10 +330,14 @@ def rateUser(request):
     rating, _ = Rating.objects.get_or_create(sport=sport, person=profile)
     rating.rate(value)
     rating.save()
+    voterProfile = Profile.objects.get(facebook_id=voterId)
+    vote = Vote(voter=voterProfile, voted=profile, sport=sport)
+    vote.save()
     # the code will loke better if we somehow call userProfileId from here
     access_token = profile.access_token
     fb_user = FacebookUserConverter(OpenFacebook(access_token))
     userInfo = profile.getUserProfile(fb_user)
+    userInfo = appendInfo(userInfo, profile, voterProfile)
     return HttpResponse(json.dumps(userInfo), content_type="application/json")
 
 def comment(request):
@@ -388,7 +401,7 @@ def getInvites(request):
             if profile in invite.persons.all():
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
-            formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id}
+            formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id, 'localizationName' : invite.localization.name, 'neighbourhood' : invite.localization.neighbourhood}
             prevList = inviteList.get(invite.sport.name, [])
             prevList.append(formattedInvite)
             inviteList[invite.sport.name] = prevList
@@ -531,15 +544,17 @@ def testUserProfile(request):
 
 def testUserProfileId(request):
     data = {
-        'id' : Profile.objects.get(facebook_name="Jairo Santos").facebook_id
+        'id' : Profile.objects.get(facebook_name="Lucas Lima").facebook_id,
+        'uId' : Profile.objects.get(facebook_name="Lucas Lima").facebook_id
     }
 
     return viewTester(data, 'userprofileid/')
 
 def testVoteInTagUser(request):
     data = {
-        'tag' : 'Gente Boa',
-        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id
+        'tag' : 'Fair Play',
+        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id,
+        'v_id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
     }
 
     return viewTester(data, 'voteintaguser/')
@@ -548,7 +563,8 @@ def testRateUser(request):
     data = {
         'sport' : 'Ping Pong',
         'value' : 1.5,
-        'id' : 4581888122223
+        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id,
+        'v_id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
     }
 
     return viewTester(data, 'rateuser/')
@@ -576,9 +592,9 @@ def testComment(request):
 
 def testInvite(request):
     data = {
-        'event_id' : 14,
+        'event_id' : 1,
         'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
-        'user_id_list' : [Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id]
+        'user_id_list' : [Profile.objects.get(facebook_name='Mateus Moury').facebook_id]
     }
     return viewTester(data, 'invite/')
 
@@ -590,7 +606,7 @@ def testgetFriends(request):
 
 def testGetInvites(request):
     data = {
-        'id' : Profile.objects.get(facebook_name='Duhan Caraciolo').facebook_id
+        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id
     }
     return viewTester(data, 'getinvites/')
 

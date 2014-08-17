@@ -6,7 +6,7 @@ import json
 from django.forms.models import model_to_dict
 from django_facebook.api import *
 from open_facebook.api import *
-from mainapp.models import *
+import mainapp.models
 import time
 from decimal import Decimal
 from django.shortcuts import render, redirect
@@ -40,7 +40,7 @@ def isSimilar(search1, search2):
 
 def getSimilarSearches(mySearch):
     ret = []
-    searches = Search.objects.all()
+    searches = mainapp.models.Search.objects.all()
     for search in searches:
         isIntersect, intersection = isSimilar(mySearch, search)
         if isIntersect:
@@ -72,3 +72,17 @@ def diffTime(time, day):
 def diffDay(time, day):
     days, minutes = diff(time, day)
     return days
+
+def appendInfo(userInfo, profile, user):
+    votes = mainapp.models.Vote.objects.filter(voter=user, voted=profile)
+    tagVotes = []
+    sportVotes = []
+    for vote in votes:
+        if vote.sport != None:
+            sport = mainapp.models.Sport.objects.get()
+            sportVotes.append(vote.sport.name)
+        elif vote.tag != None:
+            tagVotes.append(vote.tag.name)
+    userInfo['tagVotes'] = tagVotes
+    userInfo['sportVotes'] = sportVotes
+    return userInfo

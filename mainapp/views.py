@@ -22,7 +22,7 @@ from DatabaseJP.settings import APP_CURRENT_VERSION
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-# url_base = "http://localhost:8000/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -177,23 +177,23 @@ def getEvent(request):
     retEvent = event.getDetailedEvent(fb_user)
     return HttpResponse(json.dumps({"event" : retEvent}), content_type="application/json")
 
-def enterEvent(request):
+def arrive(request):
     data = json.loads(request.read())
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     eventId = data['id']
     event = Event.objects.get(id=eventId)
-    event.persons.add(profile)
+    event.arrived.add(profile)
     event.save()
     return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
 
-def leaveEvent(request):
+def cancelArrive(request):
     data = json.loads(request.read())
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     eventId = data['id']
     event = Event.objects.get(id=eventId)
-    event.persons.remove(profile)
+    event.arrived.remove(profile)
     event.save()
     return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
 
@@ -539,7 +539,7 @@ def testHeroku(request):
 
 def testGetEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'id' : 4
     }
     return viewTester(data, 'getevent/')
@@ -592,6 +592,21 @@ def testCloseEvent(request):
     }
     return viewTester(data, 'closeEvent/')
 
+def testArrive(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'id' : 4
+    }
+
+    return viewTester(data, 'arrive/')
+
+def testCancelArrive(request):
+    data = {
+        'access_token' : 'CAAJ6iZBGS5FIBAGAjtXAxbpONpW1xJBo1PcoeKQkwVWPLJC8okuf4D4eYt8aS1l21f6erZBZAQg9BNqPZAiuls4bsZBAZCxwwTHCaQsIsV0899xsD4qievDsgvHmlGhysC9WcFifuI9EwLpgUHtnT71p4WItZAl35uhNwIFYjnYxFOMyfgb7OJvSpNmJSSydFcZD',
+        'id' : 1,
+    }
+
+    return viewTester(data, 'cancelarrive/')
 
 #going to front-end
 '''

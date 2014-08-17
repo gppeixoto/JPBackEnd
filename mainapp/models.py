@@ -117,6 +117,7 @@ class Event(models.Model):
     creatorProfile = models.ForeignKey(Profile, related_name="creatorProfile", null=True)
     price = models.DecimalField(default=0.0, decimal_places=2, max_digits=5)
     persons = models.ManyToManyField(Profile)
+    arrived = models.ManyToManyField(Profile, related_name="arrived")
     localization = models.ForeignKey(Localization)
     sport = models.ForeignKey(Sport)
     date = models.DateField(default=datetime.date.today)
@@ -153,7 +154,8 @@ class Event(models.Model):
                 "neighbourhood" : self.localization.neighbourhood}
 
     def getDetailedEvent(self, fb_user):
-        participants = [(friend.facebook_id, friend.facebook_name, getUserImageUrl(friend.facebook_id)) for friend in self.persons.all()]
+        participants = [(person.facebook_id, person.facebook_name, getUserImageUrl(person.facebook_id)) for person in self.persons.all()]
+        arrived = [(person.facebook_id, person.facebook_name, getUserImageUrl(person.facebook_id)) for person in self.arrived.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
         listFriends = []
         listNotFriends = []
@@ -174,12 +176,17 @@ class Event(models.Model):
             if str(participant[0]) == str(uid):
                 isParticipating = True
                 break
+        hasArrived = False
+        for participant in arrived:
+            if str(participant[0]) == str(uid):
+                hasArrived = True
+                break
         ret = {"name" : self.name, "participants" : participants, "localizationName" : self.localization.name,
                 "localizationAddress" : self.localization.adress, "sport" : self.sport.name, "friendsCount" : len(listFriends),
                 "date" : formattedDate, "timeBegin" : formattedTimeBegin, "timeEnd" : formattedTimeEnd,
                 "description" : self.description, "comments" : comments, "id": self.id, "price" : str(price),
                 "private" : self.private, "city" : self.localization.city, "neighbourhood" : self.localization.neighbourhood,
-                "creatorID" : self.creatorProfile.facebook_id, "isParticipating" : isParticipating }
+                "creatorID" : self.creatorProfile.facebook_id, "isParticipating" : isParticipating, "arrived" : arrived, "hasArrived" : hasArrived }
         if self.lat is not None:
             ret['latitude'] = str(self.lat)
         if self.lng is not None:

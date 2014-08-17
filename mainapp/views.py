@@ -195,7 +195,7 @@ def leaveEvent(request):
     event = Event.objects.get(id=eventId)
     event.persons.remove(profile)
     event.save()
-    return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
+    return HttpResponse(json.dumps(event.getDetailedEvent(fb_user)), content_type="application/json")
 
 
 def arrive(request):
@@ -206,7 +206,7 @@ def arrive(request):
     event = Event.objects.get(id=eventId)
     event.arrived.add(profile)
     event.save()
-    return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
+    return HttpResponse(json.dumps(event.getDetailedEvent(fb_user)), content_type="application/json")
 
 def cancelArrive(request):
     data = json.loads(request.read())
@@ -216,7 +216,7 @@ def cancelArrive(request):
     event = Event.objects.get(id=eventId)
     event.arrived.remove(profile)
     event.save()
-    return HttpResponse(json.dumps(event.getEvent(fb_user)), content_type="application/json")
+    return HttpResponse(json.dumps(event.getDetailedEvent(fb_user)), content_type="application/json")
 
 def createEvent(request):
     data = json.loads(request.read())
@@ -250,7 +250,7 @@ def createEvent(request):
         newEvent.visible.add(profile)
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
-    return HttpResponse(json.dumps(bdEvent.getEvent(fb_user)), content_type="application/json")
+    return HttpResponse(json.dumps(bdEvent.getDetailedEvent(fb_user)), content_type="application/json")
 
 def editEvent(request):
     data = json.loads(request.read())
@@ -284,7 +284,7 @@ def editEvent(request):
     newEvent.save()
     # we need to query the event because of formatting issues
     bdEvent = Event.objects.get(id=id)
-    return HttpResponse(json.dumps(bdEvent.getEvent(fb_user)), content_type="application/json")
+    return HttpResponse(json.dumps(bdEvent.getDetailedEvent(fb_user)), content_type="application/json")
 
 def deleteEvent(request):
     data = json.loads(request.read())

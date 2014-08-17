@@ -22,7 +22,7 @@ from DatabaseJP.settings import APP_CURRENT_VERSION
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -334,7 +334,7 @@ def comment(request):
     comentario = data['comment']
     profile = Profile.objects.get(facebook_id=userId)
     evento = Event.objects.get(id=evtId)
-    new_comment = Comment(event=evento,person=profile,text=comentario)
+    new_comment = Comment(event=evento,person=profile,text=comentario,time=datetime.datetime.now().time(),day=datetime.datetime.today().date())
     new_comment.save()
     foto = getUserImageUrl(profile.image)
     nome = profile.facebook_name
@@ -561,7 +561,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 4
+        'id' : 27
     }
     return viewTester(data, 'getevent/')
 
@@ -569,7 +569,7 @@ def testComment(request):
     data = {
         'event_id' : '1',
         'user_id' : '687719994632948',
-        'comment' : 'Blah'
+        'comment' : 'Teste do horario'
     }
     return viewTester(data, 'comment/')
 

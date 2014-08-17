@@ -339,7 +339,10 @@ def comment(request):
     foto = getUserImageUrl(profile.facebook_id)
     nome = profile.facebook_name
     date = datetime.datetime.now() - datetime.timedelta(hours=3)
-    return HttpResponse(json.dumps({"photo":foto,"name":nome,"date":str(date)}), content_type="application/json")
+    day = str(date).split(" ")[0]
+    time = str(date).split(" ")[1]
+    time = time[:time.find(".")]
+    return HttpResponse(json.dumps({"photo":foto,"name":nome,"day":day, "time":time}), content_type="application/json")
 
 def invite(request):
     data = json.loads(request.read())

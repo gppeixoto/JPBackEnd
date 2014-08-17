@@ -336,11 +336,10 @@ def comment(request):
     evento = Event.objects.get(id=evtId)
     new_comment = Comment(event=evento,person=profile,text=comentario,time=datetime.datetime.now().time(),day=datetime.datetime.today().date())
     new_comment.save()
-    foto = getUserImageUrl(profile.image)
+    foto = getUserImageUrl(profile.facebook_id)
     nome = profile.facebook_name
-    time = new_comment.time.strftime("%H:%M")
-    day = new_comment.day.strftime("%d/%m")
-    return HttpResponse(json.dumps({"photo":foto,"name":nome,"time":str(time),"day":str(day)}), content_type="application/json")
+    date = datetime.datetime.now() - datetime.timedelta(hours=3)
+    return HttpResponse(json.dumps({"photo":foto,"name":nome,"date":str(date)}), content_type="application/json")
 
 def invite(request):
     data = json.loads(request.read())

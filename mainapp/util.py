@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from models import Sport, Rating
 from django.contrib.auth.models import User
 from django_facebook.connect import connect_user
 from django.http import HttpResponse
@@ -14,6 +13,7 @@ from django.shortcuts import render, redirect
 import urllib2
 import urllib
 import requests
+from datetime import *
 
 def isSimilar(search1, search2):
     if search1.person == search2.person:
@@ -58,3 +58,18 @@ def getDistance(origin, destiny):
     result = json.loads(page)
     result = result['rows'][0]['elements'][0]['distance']
     return result['value']
+
+def diff(time, day):
+    now = datetime.now()
+    comment = datetime(year=day.year, month=day.month, day=day.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)
+    timeDiff = now - comment
+    print str(now) + " " + str(comment) + " " + str(timeDiff)
+    return timeDiff.days, timeDiff.seconds / 60
+
+def diffTime(time, day):
+    days, minutes = diff(time, day)
+    return str(minutes / 60) + ":" + str(minutes % 60)
+
+def diffDay(time, day):
+    days, minutes = diff(time, day)
+    return days

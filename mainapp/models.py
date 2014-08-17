@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django_facebook.utils import get_user_model, get_profile_model
 import os, datetime
 from decimal import Decimal
-
+from util import diffTime, diffDay
 # Create your models here.
 
 def get_image_path(instance, filename):
@@ -165,7 +165,7 @@ class Event(models.Model):
             else:
                 listNotFriends.append(participant)
         participants = listFriends + listNotFriends
-        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id), str(comment.time), str(comment.day)) for comment in Comment.objects.filter(event=self)]
+        comments = [(comment.text, comment.person.facebook_name, comment.person.facebook_id, getUserImageUrl(comment.person.facebook_id), diffTime(comment.time, comment.day), diffDay(comment.time, comment.day)) for comment in Comment.objects.filter(event=self)]
         formattedDate = self.date.strftime("%d/%m")
         formattedTimeBegin = self.timeBegin.strftime("%H:%M")
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")

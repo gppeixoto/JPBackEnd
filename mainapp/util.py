@@ -13,7 +13,6 @@ from django.shortcuts import render, redirect
 import urllib2
 import urllib
 import requests
-from datetime import *
 
 def isSimilar(search1, search2):
     if search1.person == search2.person:
@@ -60,8 +59,8 @@ def getDistance(origin, destiny):
     return result['value']
 
 def diff(time, day):
-    now = datetime.now()
-    comment = datetime(year=day.year, month=day.month, day=day.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)
+    now = datetime.datetime.now()
+    comment = datetime.datetime(year=day.year, month=day.month, day=day.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)
     timeDiff = now - comment
     print str(now) + " " + str(comment) + " " + str(timeDiff)
     return timeDiff.days, timeDiff.seconds / 60

@@ -401,7 +401,7 @@ def getInvites(request):
             if profile in invite.persons.all():
                 continue
             formattedTimeBegin = invite.timeBegin.strftime("%H:%M")
-            formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id, 'localizationName' : invite.localization.name, 'neighbourhood' : invite.localization.neighbourhood}
+            formattedInvite = {'creator' : invite.creatorProfile.facebook_name, 'creatorImage' : getUserImageUrl(invite.creatorProfile.facebook_id), 'eventName' : invite.name, 'timeBegin' : formattedTimeBegin, 'date' : formattedDate, 'private' : invite.private, 'id' : invite.id, 'localizationName' : invite.localization.name, 'neighbourhood' : invite.localization.neighbourhood}
             prevList = inviteList.get(invite.sport.name, [])
             prevList.append(formattedInvite)
             inviteList[invite.sport.name] = prevList

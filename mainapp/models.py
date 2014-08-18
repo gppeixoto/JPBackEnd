@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django_facebook.utils import get_user_model, get_profile_model
 import os, datetime
 from decimal import Decimal
-from util import diffTime, diffDay
+from util import diffTime, diffDay, appendInfo
 # Create your models here.
 
 def get_image_path(instance, filename):
@@ -164,7 +164,18 @@ class Event(models.Model):
                 "neighbourhood" : self.localization.neighbourhood}
 
     def getDetailedEvent(self, fb_user):
-        participants = [(person.facebook_id, person.facebook_name, getUserImageUrl(person.facebook_id)) for person in self.persons.all()]
+        uid = fb_user.facebook_profile_data()['id']
+        myProfile = Profile.objects.get(facebook_id=uid)
+        participants = []
+        for person in self.persons.all():
+            fb_id = person.facebook_id
+            fb_name = person.facebook_name
+            photoUrl = getUserImageUrl(person.facebook_id)
+            dic =  appendInfo({}, person, myProfile)
+            tags = dic['tagVotes']
+            ratings = dic['sportVotes']
+            rating = self.sport.name in ratings
+            participants.append((fb_id, fb_name, photoUrl, tags, rating))
         arrived = [(person.facebook_id, person.facebook_name, getUserImageUrl(person.facebook_id)) for person in self.arrived.all()]
         fbFriendsIds = [friend['id'] for friend in fb_user.get_friends()]
         listFriends = []
@@ -181,7 +192,6 @@ class Event(models.Model):
         formattedTimeEnd = self.timeEnd.strftime("%H:%M")
         price = (Decimal('100') * self.price).quantize(Decimal('1.'))
         isParticipating = False
-        uid = fb_user.facebook_profile_data()['id']
         for participant in participants:
             if str(participant[0]) == str(uid):
                 isParticipating = True

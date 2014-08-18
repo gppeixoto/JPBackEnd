@@ -544,7 +544,7 @@ def testUserProfile(request):
 
 def testUserProfileId(request):
     data = {
-        'id' : Profile.objects.get(facebook_name="Lucas Lima").facebook_id,
+        'id' : Profile.objects.get(facebook_name="Mateus Moury").facebook_id,
         'uId' : Profile.objects.get(facebook_name="Lucas Lima").facebook_id
     }
 
@@ -561,10 +561,10 @@ def testVoteInTagUser(request):
 
 def testRateUser(request):
     data = {
-        'sport' : 'Ping Pong',
-        'value' : 1.5,
-        'id' : Profile.objects.get(facebook_name='Mateus Moury').facebook_id,
-        'v_id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id
+        'sport' : 'Futebol',
+        'value' : 2,
+        'id' : '687719994632948',
+        'v_id':'628143283960150'
     }
 
     return viewTester(data, 'rateuser/')
@@ -578,7 +578,7 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 3
+        'id' : 1
     }
     return viewTester(data, 'getevent/')
 

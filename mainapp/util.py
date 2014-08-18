@@ -62,7 +62,6 @@ def diff(time, day):
     now = datetime.datetime.now()
     comment = datetime.datetime(year=day.year, month=day.month, day=day.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)
     timeDiff = now - comment
-    print str(now) + " " + str(comment) + " " + str(timeDiff)
     return timeDiff.days, timeDiff.seconds / 60
 
 def diffTime(time, day):
@@ -71,7 +70,7 @@ def diffTime(time, day):
 
 def diffDay(time, day):
     days, minutes = diff(time, day)
-    return days
+    return days   
 
 def appendInfo(userInfo, profile, user):
     votes = mainapp.models.Vote.objects.filter(voter=user, voted=profile)

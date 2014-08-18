@@ -22,7 +22,7 @@ from DatabaseJP.settings import APP_CURRENT_VERSION
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+#url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -111,7 +111,7 @@ def getFutureEvents(request):
     else:
         retSortedEvents = retEvents
 
-    return HttpResponse(json.dumps({'events' : retEvents}), content_type="application/json")
+    return HttpResponse(json.dumps({'events' : retSortedEvents}), content_type="application/json")
 
 def getMatchedEvents(request):
     data = json.loads(request.read())
@@ -460,11 +460,11 @@ def viewTester(data, url):
 def testGetMatchedEvents(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'address' : "Centro de Informatica - UFPE",
+        'address' : "CIn-UFPE - Av. Jornalista Anibal Fernandes - Cidade Universitaria - Recife",
         'date' : "",
         'start_time' : "",
         'end_time' : "",
-        'sports' : ['xadrez']
+        'sports' : []
     }
 
     return viewTester(data, 'getmatchedevents/')

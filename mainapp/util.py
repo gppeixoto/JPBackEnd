@@ -79,7 +79,6 @@ def appendInfo(userInfo, profile, user):
     sportVotes = []
     for vote in votes:
         if vote.sport != None:
-            sport = mainapp.models.Sport.objects.get()
             sportVotes.append(vote.sport.name)
         elif vote.tag != None:
             tagVotes.append(vote.tag.name)

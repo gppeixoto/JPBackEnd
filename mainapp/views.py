@@ -22,7 +22,7 @@ from DatabaseJP.settings import APP_CURRENT_VERSION
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-url_base = "http://localhost:8000/"
+# url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -73,7 +73,7 @@ def getPast(request):
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
     events = Event.objects.filter(persons=profile, date__lte=str(datetime.datetime.today().date()))
-    events = sorted(list(events), key=cmp)
+    events = reversed(sorted(list(events), key=cmp))
     eventList = [event.getEvent(fb_user) for event in events]
 
     if 'localization' in data:

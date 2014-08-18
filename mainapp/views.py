@@ -36,11 +36,19 @@ def login(request):
     profile, fb_user = connect(request, access_token)
     return HttpResponse(json.dumps(profile.getUserProfile(fb_user)), content_type="application/json")
 
+def cmp(event):
+    date = event.date
+    time = event.timeBegin
+    date = datetime.datetime(year=date.year, month=date.month, day=date.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)
+    return date
+
 def userAgenda(request):
     data = json.loads(request.read())
     access_token = data['access_token']
     profile, fb_user = connect(request, access_token)
-    eventList = [event.getEvent(fb_user) for event in Event.objects.filter(persons=profile)]
+    events = Event.objects.filter(persons=profile, date__gte=str(datetime.datetime.today().date()))
+    events = sorted(list(events), key=cmp)
+    eventList = [event.getEvent(fb_user) for event in events]
 
     if 'localization' in data:
         localization = data['localization']
@@ -58,8 +66,34 @@ def userAgenda(request):
     else:
         retSortedEvents = eventList
 
-    retSortedEvents = reversed(sorted(retSortedEvents, key=lambda x : x['timeBegin']))
     return HttpResponse(json.dumps({'events' : retSortedEvents}), content_type="application/json")
+
+def getPast(request):
+    data = json.loads(request.read())
+    access_token = data['access_token']
+    profile, fb_user = connect(request, access_token)
+    events = Event.objects.filter(persons=profile, date__lte=str(datetime.datetime.today().date()))
+    events = sorted(list(events), key=cmp)
+    eventList = [event.getEvent(fb_user) for event in events]
+
+    if 'localization' in data:
+        localization = data['localization']
+        toSortArray = []
+        i = 0
+        for event in eventList:
+            completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
+            toSortArray.append((getDistance(localization, completeLocalization), i))
+            i += 1
+        retSortedEvents = []
+        for nextId in toSortArray:
+            actDict = eventList[nextId[1]]
+            actDict['localizationDistance'] = nextId[0]
+            retSortedEvents.append(actDict)
+    else:
+        retSortedEvents = eventList
+
+    return HttpResponse(json.dumps({'events' : retSortedEvents}), content_type="application/json")
+
 
 def userProfile(request):
     data = json.loads(request.read())
@@ -615,7 +649,14 @@ def testUserAgenda(request):
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'localization' : '-8.039573000000001,-34.899502'
     }
-    return viewTester(data, 'getfutureevents/')
+    return viewTester(data, 'useragenda/')
+
+def testGetPast(request):
+    data = {
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        'localization' : '-8.039573000000001,-34.899502'
+    }
+    return viewTester(data, 'getpast/')
 
 def testGetFutureEvents(request):
     data = {

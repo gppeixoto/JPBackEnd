@@ -48,16 +48,18 @@ def getSimilarSearches(mySearch):
     return ret
 
 def getDistance(origin, destiny):
-    queryText = "http://maps.googleapis.com/maps/api/distancematrix/json?origins="
-    queryText += origin
-    queryText += "&destinations="
-    queryText += destiny
-    queryText += "&language=pt"
-    page = requests.get(queryText).text
-    result = json.loads(page)
-    result = result['rows'][0]['elements'][0]['distance']
-    return result['value']
-
+    try:
+        queryText = "http://maps.googleapis.com/maps/api/distancematrix/json?origins="
+        queryText += origin
+        queryText += "&destinations="
+        queryText += destiny
+        queryText += "&language=pt"
+        page = requests.get(queryText).text
+        result = json.loads(page)
+        result = result['rows'][0]['elements'][0]['distance']
+        return result['value']
+    except Exception:
+        return 10**9 + 7
 def diff(time, day):
     now = datetime.datetime.now()
     comment = datetime.datetime(year=day.year, month=day.month, day=day.day, hour=time.hour, minute=time.minute, second=time.second, microsecond=time.microsecond, tzinfo=time.tzinfo)

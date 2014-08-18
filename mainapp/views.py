@@ -22,7 +22,7 @@ from DatabaseJP.settings import APP_CURRENT_VERSION
 # Create your views here.
 
 url_base = "http://join-play.herokuapp.com/"
-#url_base = "http://localhost:8000/"
+url_base = "http://localhost:8000/"
 
 def connect(request, access_token):
     action, user = connect_user(request, access_token)
@@ -50,18 +50,16 @@ def userAgenda(request):
             completeLocalization = event['localizationAddress'] + '+' + event['neighbourhood'] + '+' + event['city']
             toSortArray.append((getDistance(localization, completeLocalization), i))
             i += 1
-        toSortArray.sort()
         retSortedEvents = []
         for nextId in toSortArray:
             actDict = eventList[nextId[1]]
-            actDict['localizationDistance'] = nextId[0] / 1000
+            actDict['localizationDistance'] = nextId[0]
             retSortedEvents.append(actDict)
     else:
         retSortedEvents = eventList
 
-    return HttpResponse(json.dumps({'events' : eventList}), content_type="application/json")
-
-    return HttpResponse(json.dumps(eventList), content_type="application/json")
+    retSortedEvents = reversed(sorted(retSortedEvents, key=lambda x : x['timeBegin']))
+    return HttpResponse(json.dumps({'events' : retSortedEvents}), content_type="application/json")
 
 def userProfile(request):
     data = json.loads(request.read())
@@ -106,7 +104,7 @@ def getFutureEvents(request):
         retSortedEvents = []
         for nextId in toSortArray:
             actDict = retEvents[nextId[1]]
-            actDict['localizationDistance'] = nextId[0] / 1000
+            actDict['localizationDistance'] = nextId[0]
             retSortedEvents.append(actDict)
     else:
         retSortedEvents = retEvents
@@ -149,7 +147,7 @@ def getMatchedEvents(request):
         retSortedEvents = []
         for nextId in toSortArray:
             actDict = retEvents[nextId[1]]
-            actDict['localizationDistance'] = nextId[0] / 1000
+            actDict['localizationDistance'] = nextId[0]
             retSortedEvents.append(actDict)
     else:
         retSortedEvents = retEvents

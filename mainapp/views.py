@@ -382,7 +382,9 @@ def getFriends(request):
         except Profile.DoesNotExist:
            nextFriend = None
         if nextFriend is not None:
-            listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId)))
+            dic = appendInfo({}, nextFriend, profile)
+            tags = dic['tagVotes']
+            listFriends.append((friendId, nextFriend.facebook_name, getUserImageUrl(friendId), tags))
     return HttpResponse(json.dumps({'friends':listFriends}), content_type="application/json")
 
 def getInvites(request):

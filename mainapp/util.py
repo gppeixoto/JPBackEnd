@@ -82,6 +82,6 @@ def appendInfo(userInfo, profile, user):
             sportVotes.append(vote.sport.name)
         elif vote.tag != None:
             tagVotes.append(vote.tag.name)
-    userInfo['tagVotes'] = tagVotes
-    userInfo['sportVotes'] = sportVotes
+    userInfo['tagVotes'] = list(set(tagVotes))
+    userInfo['sportVotes'] = list(set(sportVotes))
     return userInfo

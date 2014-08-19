@@ -33,7 +33,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_facebook',
@@ -124,22 +124,22 @@ STATICFILES_DIRS = (
 
 FACEBOOK_PROFILE_IMAGE_PATH = 'DatabaseJP/static/'
 
-# #Parse database configuration from $DATABASE_URL
-# import dj_database_url
-# DATABASES['default'] =  dj_database_url.config()
+#Parse database configuration from $DATABASE_URL
+import dj_database_url
+DATABASES['default'] =  dj_database_url.config()
 
-# # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Honor the 'X-Forwarded-Proto' header for request.is_secure()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# # Allow all host headers
-# ALLOWED_HOSTS = ['*']
+# Allow all host headers
+ALLOWED_HOSTS = ['*']
 
-# # Static asset configuration
-# import os
-# PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
-# STATIC_ROOT = 'staticfiles'
-# STATIC_URL = '/static/'
+# Static asset configuration
+import os
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = 'staticfiles'
+STATIC_URL = '/static/'
 
-# STATICFILES_DIRS = (
-#     os.path.join(PROJECT_PATH, 'static'),
-# )
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_PATH, 'static'),
+)

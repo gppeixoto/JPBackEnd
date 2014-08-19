@@ -494,7 +494,7 @@ def viewTester(data, url):
 def testGetMatchedEvents(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'address' : "CIn-UFPE - Av. Jornalista Anibal Fernandes - Cidade Universitaria - Recife",
+        'address' : "menlo park",
         'date' : "",
         'start_time' : "",
         'end_time' : "",
@@ -517,12 +517,12 @@ def testCreateEvent(request):
         'localizationAddress' : 'Av. Jorn. Aníbal Fernandes',
         'city' : 'Recife',
         'neighbourhood' : 'Cidade Universitaria',
-        'eventSport' : 'Ping Pong',
+        'eventSport' : 'Futebol',
         'eventDay' : '2014-12-12',
         'eventTimeBegin' : '14:30',
         'eventTimeEnd' : '19:00',
         'eventDescription' : 'Bla bla bla',
-        'eventName' : 'Xadrez na Subregional',
+        'eventName' : 'A',
         'eventPrice' : '60.00',
         'private' : True,
         'latitude': '-8.039573000000001',
@@ -533,13 +533,13 @@ def testCreateEvent(request):
 
 def testEditEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
         'localizationName' : 'CIn - UFPE',
         'localizationAddress' : 'Av. Jornalista Anibal Fernandes',
         'city' : 'Recife',
         'neighbourhood' : 'Cidade Universitaria',
-        'eventSport' : 'Ping Pong',
-        'eventDay' : '2014-08-10',
+        'eventSport' : 'Futebol',
+        'eventDay' : '2014-08-20',
         'eventTimeBegin' : '08:00',
         'eventTimeEnd' : '12:00',
         'eventDescription' : 'Demo day',
@@ -548,23 +548,23 @@ def testEditEvent(request):
         'private' : False,
         'latitude': '-8.04973000000001',
         'longitude': '-34.899502',
-        'id' : '3'
+        'id' : '39'
     }
 
     return viewTester(data, 'editevent/')
 
 def testEnterEvent(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Duhan Caraciolo').access_token,
-        'id' : 4
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'id' : 39
     }
 
     return viewTester(data, 'enterevent/')
 
 def testLeaveEvent(request):
     data = {
-        'access_token' : 'CAAJ6iZBGS5FIBAGAjtXAxbpONpW1xJBo1PcoeKQkwVWPLJC8okuf4D4eYt8aS1l21f6erZBZAQg9BNqPZAiuls4bsZBAZCxwwTHCaQsIsV0899xsD4qievDsgvHmlGhysC9WcFifuI9EwLpgUHtnT71p4WItZAl35uhNwIFYjnYxFOMyfgb7OJvSpNmJSSydFcZD',
-        'id' : 1,
+        'access_token' : Profile.objects.get(facebook_name='Mateus Moury').access_token,
+        'id' : 39,
     }
 
     return viewTester(data, 'leaveevent/')
@@ -612,21 +612,21 @@ def testHeroku(request):
 def testGetEvent(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 1
+        'id' : 39
     }
     return viewTester(data, 'getevent/')
 
 def testComment(request):
     data = {
-        'event_id' : '1',
-        'user_id' : '687719994632948',
+        'event_id' : '39',
+        'user_id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
         'comment' : 'Teste do horario'
     }
     return viewTester(data, 'comment/')
 
 def testInvite(request):
     data = {
-        'event_id' : 1,
+        'event_id' : 39,
         'id' : Profile.objects.get(facebook_name='Lucas Lima').facebook_id,
         'user_id_list' : [Profile.objects.get(facebook_name='Mateus Moury').facebook_id]
     }
@@ -660,21 +660,21 @@ def testGetPast(request):
 
 def testGetFutureEvents(request):
     data = {
-        'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'localization' : '-8.039573000000001,-34.899502'
+        'access_token' : 'CAAJ6iZBGS5FIBAGfiSDxZAEWF15B1NbGbjyyHR81aWmZA7qYeihi6nE1zo67xqDgX5p4NmfpjZCPPoZADQHjd1oICZAvEilu4pPitKeOyQ6HQIFZCzerMzFre8JCyg9yghZAlCpZBZC6nv1cUNb0JJUEHCUqzTdKqthq6ac0zpNGk7M8V2vqkYgcWZB7sSlAkvHWqzCrDyTO56LvZCZCDH7flWaEQTUKRLjVQEVZBqZA9e4AicSCgZDZD'#Profile.objects.get(facebook_name='Lucas Lima').access_token,
+        #'localization' : '-.05576671,-34.95200721'
     }
     return viewTester(data, 'getfutureevents/')
 
 def testCloseEvent(request):
     data = {
-        'id' : 1
+        'id' : 39
     }
-    return viewTester(data, 'closeEvent/')
+    return viewTester(data, 'closeevent/')
 
 def testArrive(request):
     data = {
         'access_token' : Profile.objects.get(facebook_name='Lucas Lima').access_token,
-        'id' : 4
+        'id' : 39
     }
 
     return viewTester(data, 'arrive/')
@@ -682,7 +682,7 @@ def testArrive(request):
 def testCancelArrive(request):
     data = {
         'access_token' : 'CAAJ6iZBGS5FIBAGAjtXAxbpONpW1xJBo1PcoeKQkwVWPLJC8okuf4D4eYt8aS1l21f6erZBZAQg9BNqPZAiuls4bsZBAZCxwwTHCaQsIsV0899xsD4qievDsgvHmlGhysC9WcFifuI9EwLpgUHtnT71p4WItZAl35uhNwIFYjnYxFOMyfgb7OJvSpNmJSSydFcZD',
-        'id' : 1,
+        'id' : 39,
     }
 
     return viewTester(data, 'cancelarrive/')
